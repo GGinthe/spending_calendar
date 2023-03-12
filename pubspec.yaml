@@ -1,0 +1,50 @@
+name: spending_calendar
+description: A new Flutter project.
+
+publish_to: 'none' # Remove this line if you wish to publish to pub.dev
+
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.0.0-245.0.dev <4.0.0'
+
+
+dependencies:
+  bloc: ^8.1.1
+  equatable: ^2.0.5
+  flutter:
+    sdk: flutter
+  flutter_bloc: ^8.1.2
+  flutter_localizations:
+    sdk: flutter
+  intl: ^0.18.0
+  cupertino_icons: ^1.0.5
+  local_storage_tasks_api:
+    path: packages/local_storage_tasks_api
+  tasks_api:
+    path: packages/tasks_api
+  tasks_repository:
+    path: packages/tasks_repository
+  very_good_cli: ^0.12.2
+  table_calendar: ^3.0.3
+  omni_datetime_picker: ^1.0.1
+  syncfusion_flutter_calendar: ^20.4.53
+
+
+dev_dependencies:
+  bloc_test: ^9.1.1
+  flutter_test:
+    sdk: flutter
+  mockingjay: ^0.3.0
+  mocktail: ^0.3.0
+  very_good_analysis: ^4.0.0+1
+  flutter_lints: ^2.0.1
+
+
+flutter:
+  uses-material-design: true
+  generate: true
+  # To add assets to your application, add an assets section, like this:
+  # assets:
+  #   - images/a_dot_burr.jpeg
+  #   - images/a_dot_ham.jpeg
