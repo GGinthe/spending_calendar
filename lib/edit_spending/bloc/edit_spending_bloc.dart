@@ -19,6 +19,8 @@ class EditSpendingBloc extends Bloc<EditSpendingEvent, EditSpendingState> {
           EditSpendingState(
             initialSpending: initialSpending,
             title: initialSpending?.title ?? '',
+            startDate: initialSpending?.startDate,
+            taskId: initialSpending?.taskId,
           ),
         ) {
     on<EditSpendingTaskChanged>(_onTaskChanged);

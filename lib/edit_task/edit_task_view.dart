@@ -146,16 +146,16 @@ class _StartDatePicker extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final state = context.watch<EditTaskBloc>().state;
-    final startDate = state.initialTask?.startDate;
-    final pickerDate = state.startDate;
-    DateTime? initialDate;
+    //final startDate = state.initialTask?.startDate;
+    final DateTime? startDate = state.startDate;
+    /*DateTime? initialDate;
     if (pickerDate != null) {
       initialDate = pickerDate;
     } else if (startDate != null) {
       initialDate = startDate;
-    }
+    }*/
     final initialStartText =
-        initialDate == null ? '請選擇日期' : DateFormat('yyyy 年 MM 月 dd 日 – kk 點 mm 分').format(initialDate);
+    startDate == null ? '請選擇日期' : DateFormat('yyyy 年 MM 月 dd 日 – kk 點 mm 分').format(startDate);
 
     return TextFormField(
       key: Key(initialStartText),
@@ -169,7 +169,7 @@ class _StartDatePicker extends StatelessWidget {
       onTap: () async {
         DateTime? pickerDate = await showOmniDateTimePicker(
           context: context,
-          initialDate: initialDate,
+          initialDate: startDate,
         );
         if (context.mounted && pickerDate != null) {
           context.read<EditTaskBloc>().add(EditTaskStartDateChanged(pickerDate));
@@ -185,16 +185,16 @@ class _EndDatePicker extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final state = context.watch<EditTaskBloc>().state;
-    final endDate = state.initialTask?.endDate;
-    final pickerDate = state.endDate;
-    DateTime? initialDate;
+    //final endDate = state.initialTask?.endDate;
+    final endDate = state.endDate;
+    /*DateTime? initialDate;
     if (pickerDate != null) {
       initialDate = pickerDate;
     } else if (endDate != null) {
       initialDate = endDate;
-    }
+    }*/
     final initialEndText =
-        initialDate == null ? '請選擇日期' : DateFormat('yyyy 年 MM 月 dd 日 – kk 點 mm 分').format(initialDate);
+    endDate == null ? '請選擇日期' : DateFormat('yyyy 年 MM 月 dd 日 – kk 點 mm 分').format(endDate);
     return TextFormField(
       key: Key(initialEndText),
       initialValue: initialEndText,
@@ -207,7 +207,7 @@ class _EndDatePicker extends StatelessWidget {
       onTap: () async {
         DateTime? pickerDate = await showOmniDateTimePicker(
           context: context,
-          initialDate: initialDate,
+          initialDate: endDate,
         );
         if (context.mounted && pickerDate != null) {
           context.read<EditTaskBloc>().add(EditTaskEndDateChanged(pickerDate));

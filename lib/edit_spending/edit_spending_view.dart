@@ -163,16 +163,16 @@ class _StartDatePicker extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final state = context.watch<EditSpendingBloc>().state;
-    final startDate = state.initialSpending?.startDate;
-    final pickerDate = state.startDate;
-    DateTime? initialDate;
+    //final startDate = state.initialSpending?.startDate;
+    final startDate = state.startDate;
+    /*DateTime? initialDate;
     if (pickerDate != null) {
       initialDate = pickerDate;
     } else if (startDate != null) {
       initialDate = startDate;
-    }
+    }*/
     final initialStartText =
-        initialDate == null ? '請選擇日期' : DateFormat('yyyy 年 MM 月 dd 日').format(initialDate);
+    startDate == null ? '請選擇日期' : DateFormat('yyyy 年 MM 月 dd 日').format(startDate);
 
     return TextFormField(
       key: Key(initialStartText),
@@ -186,7 +186,7 @@ class _StartDatePicker extends StatelessWidget {
       onTap: () async {
         DateTime? pickerDate = await showDatePicker(
           context: context,
-          initialDate: initialDate ?? DateTime.now(),
+          initialDate: startDate ?? DateTime.now(),
           firstDate: DateTime(2000),
           lastDate: DateTime(2100),
         );
@@ -204,11 +204,9 @@ class _TaskDropDownButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final state = context.watch<EditSpendingBloc>().state;
-    context.read<EditSpendingBloc>().add(EditSpendingTaskChanged(state.initialSpending?.taskId));
+    final hintText = state.initialSpending?.taskId; // get title from id
     final pickerTask = state.taskId == '' ? null : state.taskId;
-    final taskList = [
-      ...[for (var task in state.tasks) task.toString()]
-    ];
+    final taskList = [for (var task in state.tasks) task.toString()];
 
     return DropdownButtonFormField<String>(
       key: const Key('editSpendingView_task_dropdownButton'),

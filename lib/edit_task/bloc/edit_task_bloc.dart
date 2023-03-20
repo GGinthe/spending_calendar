@@ -16,6 +16,8 @@ class EditTaskBloc extends Bloc<EditTaskEvent, EditTaskState> {
             initialTask: initialTask,
             title: initialTask?.title ?? '',
             description: initialTask?.description ?? '',
+            startDate: initialTask?.startDate,
+            endDate: initialTask?.endDate,
           ),
         ) {
     on<EditTaskTitleChanged>(_onTitleChanged);
