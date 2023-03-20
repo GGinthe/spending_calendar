@@ -1,19 +1,27 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:spending_calendar/home/home.dart';
-//import 'package:spending_calendar/l10n/l10n.dart';
 import 'package:spending_calendar/app/theme.dart';
 import 'package:tasks_repository/tasks_repository.dart';
+import 'package:spending_repository/spending_repository.dart';
 
 class App extends StatelessWidget {
-  const App({super.key, required this.tasksRepository});
+  const App({super.key, required this.tasksRepository, required this.spendingsRespository});
 
   final TasksRepository tasksRepository;
+  final SpendingRepository spendingsRespository;
 
   @override
   Widget build(BuildContext context) {
-    return RepositoryProvider.value(
+    /*return RepositoryProvider.value(
       value: tasksRepository,
+      child: const AppView(),
+    );*/
+    return MultiRepositoryProvider(
+      providers:[
+        RepositoryProvider.value(value: tasksRepository),
+        RepositoryProvider.value(value: spendingsRespository),
+      ],
       child: const AppView(),
     );
   }

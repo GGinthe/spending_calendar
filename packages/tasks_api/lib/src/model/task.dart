@@ -1,10 +1,23 @@
 import 'package:equatable/equatable.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:json_annotation/json_annotation.dart';
-import 'package:meta/meta.dart';
 import 'package:tasks_api/tasks_api.dart';
 import 'package:uuid/uuid.dart';
 
 part 'task.g.dart';
+
+/// Create a new Color from int.
+class ColorSerialiser implements JsonConverter<Color, int> {
+  /// TO use json_serial
+  const ColorSerialiser();
+
+  @override
+  Color fromJson(int json) => Color(json);
+
+  @override
+  int toJson(Color color) => color.value;
+}
 
 /// {@template task_item}
 /// A single `task` item.
@@ -25,6 +38,9 @@ class Task extends Equatable {
     this.startDate,
     this.endDate,
     this.deleteDate,
+    this.subject,
+    this.color,
+    this.isAllDay = false,
   })  : assert(
           id == null || id.isNotEmpty,
           'id can not be null and should be empty',
@@ -55,6 +71,16 @@ class Task extends Equatable {
   /// Fake delete of the task
   final DateTime? deleteDate;
 
+  /// Task's subject
+  final String? subject;
+
+  /// Color of the task
+  @ColorSerialiser()
+  final Color? color;
+
+  /// whether the task is all day
+  final bool isAllDay;
+
   /// Returns a copy of this `task` with the given values updated.
   ///
   /// {@macro task_item}
@@ -67,6 +93,9 @@ class Task extends Equatable {
     DateTime? startDate,
     DateTime? endDate,
     DateTime? deleteDate,
+    String? subject,
+    Color? color,
+    bool? isAllDay,
   }) {
     return Task(
       id: id ?? this.id,
@@ -77,6 +106,9 @@ class Task extends Equatable {
       startDate: startDate ?? this.startDate,
       endDate: endDate ?? this.endDate,
       deleteDate: deleteDate ?? this.deleteDate,
+      subject: subject ?? this.subject,
+      color: color ?? this.color,
+      isAllDay: isAllDay ?? this.isAllDay,
     );
   }
 
@@ -99,5 +131,8 @@ class Task extends Equatable {
         startDate ?? false,
         endDate ?? false,
         deleteDate ?? false,
+        subject ?? false,
+        color ?? false,
+        isAllDay,
       ];
 }

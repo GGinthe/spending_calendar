@@ -25,6 +25,12 @@ dependencies:
     path: packages/tasks_api
   tasks_repository:
     path: packages/tasks_repository
+  local_storage_spendings_api:
+    path: packages/local_storage_spendings_api
+  spending_api:
+    path: packages/spending_api
+  spending_repository:
+    path: packages/spending_repository
   very_good_cli: ^0.12.2
   table_calendar: ^3.0.3
   omni_datetime_picker: ^1.0.1

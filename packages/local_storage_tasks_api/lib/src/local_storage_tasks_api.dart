@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:flutter/material.dart' show DateUtils;
 import 'package:meta/meta.dart';
 import 'package:rxdart/subjects.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -8,7 +9,7 @@ import 'package:tasks_api/tasks_api.dart';
 
 /// {@template local_storage_tasks_api}
 /// A Flutter implementation of the [TasksApi] that uses local storage.
-/// {@endtemplate}
+/// {@template}
 class LocalStorageTasksApi extends TasksApi {
   /// {@macro local_storage_tasks_api}
   LocalStorageTasksApi({
@@ -30,8 +31,10 @@ class LocalStorageTasksApi extends TasksApi {
 
   String? _getValue(String key) => _plugin.getString(key);
 
-  Future<void> _setValue(String key, String value) =>
-      _plugin.setString(key, value);
+  Future<void> _setValue(String key, String value) => _plugin.setString(key, value);
+
+  /// Task
+  late List<Task> tasks;
 
   /// get json from local storage.
   /// If first time, create an empty json.
@@ -39,13 +42,12 @@ class LocalStorageTasksApi extends TasksApi {
   void _init() {
     final tasksJson = _getValue(kTasksCollectionKey);
     if (tasksJson != null) {
-      final tasks = List<Map<dynamic, dynamic>>.from(
+      tasks = List<Map<dynamic, dynamic>>.from(
         json.decode(tasksJson) as List,
-      )
-          .map((jsonMap) => Task.fromJson(Map<String, dynamic>.from(jsonMap)))
-          .toList();
+      ).map((jsonMap) => Task.fromJson(Map<String, dynamic>.from(jsonMap))).toList();
       _taskStreamController.add(tasks);
     } else {
+      tasks = [];
       _taskStreamController.add(const []);
     }
   }
@@ -102,13 +104,15 @@ class LocalStorageTasksApi extends TasksApi {
   @override
   Future<int> completeAll({required bool isCompleted}) async {
     final tasks = [..._taskStreamController.value];
-    final changedTasksAmount =
-        tasks.where((t) => t.isCompleted != isCompleted).length;
-    final newTasks = [
-      for (final task in tasks) task.copyWith(isCompleted: isCompleted)
-    ];
+    final changedTasksAmount = tasks.where((t) => t.isCompleted != isCompleted).length;
+    final newTasks = [for (final task in tasks) task.copyWith(isCompleted: isCompleted)];
     _taskStreamController.add(newTasks);
     await _setValue(kTasksCollectionKey, json.encode(newTasks));
     return changedTasksAmount;
+  }
+
+  @override
+  List<Task> getDayTasks(DateTime dateTime) {
+    return tasks.where((task) => DateUtils.isSameDay(task.startDate, dateTime)).toList();
   }
 }

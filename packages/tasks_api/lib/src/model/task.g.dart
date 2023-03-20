@@ -18,6 +18,13 @@ Task _$TaskFromJson(Map<String, dynamic> json) => Task(
       endDate: json['endDate'] == null
           ? null
           : DateTime.parse(json['endDate'] as String),
+      deleteDate: json['deleteDate'] == null
+          ? null
+          : DateTime.parse(json['deleteDate'] as String),
+      subject: json['subject'] as String?,
+      color: _$JsonConverterFromJson<int, Color>(
+          json['color'], const ColorSerialiser().fromJson,),
+      isAllDay: json['isAllDay'] as bool? ?? false,
     );
 
 Map<String, dynamic> _$TaskToJson(Task instance) => <String, dynamic>{
@@ -28,4 +35,21 @@ Map<String, dynamic> _$TaskToJson(Task instance) => <String, dynamic>{
       'isDeleted': instance.isDeleted,
       'startDate': instance.startDate?.toIso8601String(),
       'endDate': instance.endDate?.toIso8601String(),
+      'deleteDate': instance.deleteDate?.toIso8601String(),
+      'subject': instance.subject,
+      'color': _$JsonConverterToJson<int, Color>(
+          instance.color, const ColorSerialiser().toJson,),
+      'isAllDay': instance.isAllDay,
     };
+
+Value? _$JsonConverterFromJson<Json, Value>(
+  Object? json,
+  Value? Function(Json json) fromJson,
+) =>
+    json == null ? null : fromJson(json as Json);
+
+Json? _$JsonConverterToJson<Json, Value>(
+  Value? value,
+  Json? Function(Value value) toJson,
+) =>
+    value == null ? null : toJson(value);

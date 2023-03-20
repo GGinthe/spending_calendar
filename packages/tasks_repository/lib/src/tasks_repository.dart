@@ -2,7 +2,7 @@ import 'package:tasks_api/tasks_api.dart';
 
 /// {@template tasks_repository}
 /// A repository that handles `task` related requests.
-/// {@endtemplate}
+/// {@template}
 class TasksRepository {
   /// {@macro tasks_repository}
   const TasksRepository({
@@ -13,6 +13,9 @@ class TasksRepository {
 
   /// Provides a [Stream] of all tasks.
   Stream<List<Task>> getTasks() => _tasksApi.getTasks();
+
+  /// Return [Task] in given DateTime.
+  List<Task> getDayTasks(DateTime dateTime) => _tasksApi.getDayTasks(dateTime);
 
   /// Saves a [task].
   /// If a [task] with the same id already exists, it will be replaced.

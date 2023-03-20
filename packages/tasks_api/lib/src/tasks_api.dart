@@ -2,13 +2,16 @@ import 'package:tasks_api/tasks_api.dart';
 
 /// {@template tasks_api}
 /// The interface for an API that provides access to a list of tasks.
-/// {@endtemplate}
+/// {@template}
 abstract class TasksApi {
   /// {@macro tasks_api}
   const TasksApi();
 
   /// Provides a [Stream] of all tasks.
   Stream<List<Task>> getTasks();
+
+  /// Return [Task] in given DateTime.
+  List<Task> getDayTasks(DateTime dateTime);
 
   /// If a [task] with the same id already exists, it will be replaced.
   Future<void> saveTask(Task task);
@@ -34,5 +37,5 @@ abstract class TasksApi {
   Future<int> completeAll({required bool isCompleted});
 }
 
-/// Error thrown when a [task] with a given id is not found.
+/// Error thrown when a [Task] with a given id is not found.
 class TaskNotFoundException implements Exception {}

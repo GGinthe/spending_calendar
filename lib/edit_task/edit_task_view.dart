@@ -103,7 +103,7 @@ class _TitleField extends StatelessWidget {
       maxLength: 50,
       inputFormatters: [
         LengthLimitingTextInputFormatter(50),
-        FilteringTextInputFormatter.allow(RegExp(r'[a-zA-Z\d\s]')),
+        //FilteringTextInputFormatter.allow(RegExp(r'[a-zA-Z\d\s]')),
       ],
       onChanged: (value) {
         context.read<EditTaskBloc>().add(EditTaskTitleChanged(value));

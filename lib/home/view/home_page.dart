@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:spending_calendar/edit_task/edit_task.dart';
+import 'package:spending_calendar/edit_spending/edit_spending.dart';
 import 'package:spending_calendar/home/home.dart';
-import 'package:spending_calendar/spending/spending.dart';
+import 'package:spending_calendar/book/book.dart';
 import 'package:spending_calendar/calendar/calendar.dart';
+
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -27,12 +29,17 @@ class HomeView extends StatelessWidget {
     return Scaffold(
       body: IndexedStack(
         index: selectedTab.index,
-        children: const [CalendarPage(), SpendingPage()],
+        children: const [CalendarPage(), BookPage()],
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       floatingActionButton: FloatingActionButton(
         key: const Key('homeView_addTask_floatingActionButton'),
-        onPressed: () => Navigator.of(context).push(EditTaskPage.route()),
+        onPressed: ()=>{
+          if(selectedTab == HomeTab.calendar)
+            Navigator.of(context).push(EditTaskPage.route())
+          else if(selectedTab == HomeTab.spending)
+            Navigator.of(context).push(EditSpendingPage.route())
+        },
         child: const Icon(Icons.add),
       ),
       bottomNavigationBar: BottomAppBar(
