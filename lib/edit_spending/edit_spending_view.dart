@@ -29,7 +29,10 @@ class EditSpendingPage extends StatelessWidget {
     return BlocListener<EditSpendingBloc, EditSpendingState>(
       listenWhen: (previous, current) =>
           previous.status != current.status && current.status == EditSpendingStatus.success,
-      listener: (context, state) => Navigator.of(context).pop(),
+      listener: (context, state) {
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('創建成功')));
+        Navigator.of(context).pop();
+      },
       child: const EditSpendingView(),
     );
   }
@@ -73,18 +76,26 @@ class EditSpendingView extends StatelessWidget {
             child: Column(
               children: [
                 _TitleField(),
-                _MoneyField(),
-                /*_SubjectDropDownButton(),
-                SizedBox(height: 10),
-                _StartDatePicker(),*/
+                Row(
+                  children: [
+                    Expanded(
+                      flex: 4,
+                      child: _MoneyField(),
+                    ),
+                    Expanded(
+                      flex: 1,
+                      child: _SpendingTypeButton(),
+                    ),
+                  ],
+                ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
-                    Flexible(
+                    Expanded(
                       child: _SubjectDropDownButton(),
                     ),
-                    SizedBox(width: 20),
-                    Flexible(
+                    SizedBox(width: 10),
+                    Expanded(
                       child: _StartDatePicker(),
                     ),
                   ],
@@ -106,23 +117,39 @@ class _TitleField extends StatelessWidget {
   Widget build(BuildContext context) {
     final state = context.watch<EditSpendingBloc>().state;
     final hintText = state.initialSpending?.title ?? '';
-
-    return TextFormField(
-      key: const Key('editSpendingView_title_textFormField'),
-      initialValue: state.title,
-      decoration: InputDecoration(
-        enabled: !state.status.isLoadingOrSuccess,
-        labelText: '標題',
-        hintText: hintText,
-      ),
-      maxLength: 50,
-      inputFormatters: [
-        LengthLimitingTextInputFormatter(50),
-        FilteringTextInputFormatter.allow(RegExp(r'[a-zA-Z\d\s]')),
+    const maxLength = 25;
+    final textLength = state.title.length;
+    return Column(
+      children: [
+        TextFormField(
+          key: const Key('editSpendingView_title_textFormField'),
+          initialValue: state.title,
+          decoration: InputDecoration(
+            enabled: !state.status.isLoadingOrSuccess,
+            labelText: '標題',
+            hintText: hintText,
+            suffixText: '${textLength.toString()}/${maxLength.toString()}',
+            counterText: "",
+          ),
+          maxLength: maxLength,
+          style: const TextStyle(fontSize: 20),
+          inputFormatters: [
+            LengthLimitingTextInputFormatter(maxLength),
+            //FilteringTextInputFormatter.allow(RegExp(r'[a-zA-Z\d\s]')),
+          ],
+          onChanged: (value) {
+            context.read<EditSpendingBloc>().add(EditSpendingTitleChanged(value));
+          },
+        ),
+        if (!state.isTitleFieldCorrect) ...[
+          const Text(
+            '標題無法空白',
+            style: TextStyle(color: Colors.red),
+          ),
+        ] else ...[
+          const SizedBox(height: 15)
+        ],
       ],
-      onChanged: (value) {
-        context.read<EditSpendingBloc>().add(EditSpendingTitleChanged(value));
-      },
     );
   }
 }
@@ -134,26 +161,76 @@ class _MoneyField extends StatelessWidget {
   Widget build(BuildContext context) {
     final state = context.watch<EditSpendingBloc>().state;
     final hintText = state.initialSpending?.money.toString() ?? '';
+    const maxLength = 10;
+    String labelText = '支出';
+    if (state.spendingType == SpendingType.income) {
+      labelText = '收入';
+    } else {
+      labelText = '支出';
+    }
 
-    return TextFormField(
-      key: const Key('editSpendingView_money_textFormField'),
-      initialValue: state.money.toString(),
-      decoration: InputDecoration(
-        enabled: !state.status.isLoadingOrSuccess,
-        labelText: '支出',
-        hintText: hintText,
-      ),
-      maxLength: 50,
-      keyboardType: TextInputType.number,
-      inputFormatters: [
-        LengthLimitingTextInputFormatter(10),
-        FilteringTextInputFormatter.digitsOnly,
+    return Column(
+      children: [
+        TextFormField(
+          key: const Key('editSpendingView_money_textFormField'),
+          initialValue: state.money.toString(),
+          decoration: InputDecoration(
+            enabled: !state.status.isLoadingOrSuccess,
+            labelText: labelText,
+            hintText: hintText,
+            counterText: "",
+          ),
+          maxLength: maxLength,
+          style: const TextStyle(fontSize: 20),
+          keyboardType: TextInputType.number,
+          inputFormatters: [
+            LengthLimitingTextInputFormatter(maxLength),
+            FilteringTextInputFormatter.digitsOnly,
+            FilteringTextInputFormatter.deny(RegExp('^0+'))
+          ],
+          // Only numbers can be entered
+          onChanged: (value) {
+            context.read<EditSpendingBloc>().add(EditSpendingMoneyChanged(int.tryParse(value) ?? 0));
+          },
+        ),
+        if (!state.isMoneyFieldCorrect) ...[
+          const Text(
+            '花費無法為零',
+            style: TextStyle(color: Colors.red),
+          ),
+        ] else ...[
+          const SizedBox(height: 15)
+        ],
       ],
-      // Only numbers can be entered
-      onChanged: (value) {
-        context.read<EditSpendingBloc>().add(EditSpendingMoneyChanged(int.parse(value)));
-      },
     );
+  }
+}
+
+class _SpendingTypeButton extends StatelessWidget {
+  const _SpendingTypeButton();
+
+  @override
+  Widget build(BuildContext context) {
+    final state = context.watch<EditSpendingBloc>().state;
+    final spendingType = context.select((EditSpendingBloc bloc) => bloc.state.spendingType);
+    String buttonText = '收入';
+    if (spendingType == SpendingType.income) {
+      buttonText = '支出';
+    } else if (spendingType == SpendingType.expenses) {
+      buttonText = '收入';
+    }
+
+    return ElevatedButton(
+        style: ElevatedButton.styleFrom(
+            padding: const EdgeInsets.all(10) //content padding inside button
+        ),
+        onPressed: () {
+          context.read<EditSpendingBloc>().add(const EditSpendingTypeChanged());
+        },
+        child: Text(
+          buttonText,
+          style: const TextStyle(fontSize: 17),
+        ));
   }
 }
 
@@ -163,37 +240,40 @@ class _StartDatePicker extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final state = context.watch<EditSpendingBloc>().state;
-    //final startDate = state.initialSpending?.startDate;
     final startDate = state.startDate;
-    /*DateTime? initialDate;
-    if (pickerDate != null) {
-      initialDate = pickerDate;
-    } else if (startDate != null) {
-      initialDate = startDate;
-    }*/
-    final initialStartText =
-    startDate == null ? '請選擇日期' : DateFormat('yyyy 年 MM 月 dd 日').format(startDate);
+    final initialStartText = startDate == null ? '請選擇日期' : DateFormat('yyyy 年 MM 月 dd 日').format(startDate);
 
-    return TextFormField(
-      key: Key(initialStartText),
-      initialValue: initialStartText,
-      decoration: InputDecoration(
-        enabled: !state.status.isLoadingOrSuccess,
-        labelText: '日期',
-        hintText: 'hintText',
-      ),
-      readOnly: true,
-      onTap: () async {
-        DateTime? pickerDate = await showDatePicker(
-          context: context,
-          initialDate: startDate ?? DateTime.now(),
-          firstDate: DateTime(2000),
-          lastDate: DateTime(2100),
-        );
-        if (context.mounted && pickerDate != null) {
-          context.read<EditSpendingBloc>().add(EditSpendingStartDateChanged(pickerDate));
-        }
-      },
+    return Column(
+      children: [
+        TextFormField(
+          key: Key(initialStartText),
+          initialValue: initialStartText,
+          decoration: InputDecoration(
+            enabled: !state.status.isLoadingOrSuccess,
+            labelText: '日期',
+            contentPadding: const EdgeInsets.symmetric(vertical: 15.5),
+          ),
+          readOnly: true,
+          style: const TextStyle(fontSize: 20),
+          onTap: () async {
+            DateTime? pickerDate = await showDatePicker(
+              context: context,
+              initialDate: startDate ?? DateTime.now(),
+              firstDate: DateTime(2000),
+              lastDate: DateTime(2100),
+            );
+            if (context.mounted && pickerDate != null) {
+              context.read<EditSpendingBloc>().add(EditSpendingStartDateChanged(pickerDate));
+            }
+          },
+        ),
+        if (!state.isTimeFieldCorrect) ...[
+          const Text(
+            '請選擇日期',
+            style: TextStyle(color: Colors.red),
+          ),
+        ],
+      ],
     );
   }
 }
@@ -204,24 +284,32 @@ class _TaskDropDownButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final state = context.watch<EditSpendingBloc>().state;
-    final hintText = state.initialSpending?.taskId; // get title from id
-    final pickerTask = state.taskId == '' ? null : state.taskId;
-    final taskList = [for (var task in state.tasks) task.toString()];
+    final pickerTask = state.selectedTaskId == '' ? null : state.selectedTaskId;
+    final taskList = state.tasks;
 
     return DropdownButtonFormField<String>(
       key: const Key('editSpendingView_task_dropdownButton'),
       decoration: InputDecoration(
         enabled: !state.status.isLoadingOrSuccess,
         labelText: '行程花費',
-        hintText: 'hintText',
+        labelStyle: const TextStyle(fontSize: 20),
       ),
+      //style: const TextStyle(fontSize: 20),
+      itemHeight: 50,
       items: taskList.isNotEmpty
-          ? taskList.map((title) {
-              return DropdownMenuItem(value: title, child: Text(title));
+          ? taskList.map((task) {
+              return DropdownMenuItem(
+                  value: task.id,
+                  child: Text(
+                    task.title,
+                    style: const TextStyle(fontSize: 20),
+                  ));
             }).toList()
           : null,
       value: pickerTask,
-      hint: const Text('此日無行程'),
+      iconSize: 30.0,
+      hint: const Text('請選擇行程'),
+      disabledHint: const Text('此日無行程'),
       onChanged: (value) {
         context.read<EditSpendingBloc>().add(EditSpendingTaskChanged(value ?? ''));
       },
@@ -242,15 +330,21 @@ class _SubjectDropDownButton extends StatelessWidget {
       decoration: InputDecoration(
         enabled: !state.status.isLoadingOrSuccess,
         labelText: '類別',
-        hintText: 'hintText',
+        labelStyle: const TextStyle(fontSize: 20),
       ),
+      itemHeight: 50,
+      isExpanded: true,
       items: itemList.map<DropdownMenuItem<String>>((String value) {
         return DropdownMenuItem<String>(
           value: value,
-          child: Text(value),
+          child: Text(
+            value,
+            style: const TextStyle(fontSize: 20),
+          ),
         );
       }).toList(),
       value: hintText,
+      iconSize: 30.0,
       hint: const Text('類別'),
       onChanged: (value) {
         context.read<EditSpendingBloc>().add(EditSpendingSubjectChanged(value ?? ''));

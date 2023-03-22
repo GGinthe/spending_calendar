@@ -20,10 +20,12 @@ class EditSpendingBloc extends Bloc<EditSpendingEvent, EditSpendingState> {
             initialSpending: initialSpending,
             title: initialSpending?.title ?? '',
             startDate: initialSpending?.startDate,
-            taskId: initialSpending?.taskId,
+            selectedTaskId: initialSpending?.taskId,
+            money: initialSpending?.money ?? 0,
           ),
         ) {
     on<EditSpendingTaskChanged>(_onTaskChanged);
+    on<EditSpendingTypeChanged>(_onTypeChanged);
     on<EditSpendingTitleChanged>(_onTitleChanged);
     on<EditSpendingMoneyChanged>(_onMoneyChanged);
     on<EditSpendingStartDateChanged>(_onStartDateChanged);
@@ -34,10 +36,17 @@ class EditSpendingBloc extends Bloc<EditSpendingEvent, EditSpendingState> {
   final SpendingRepository _spendingsRepository;
   final TasksRepository _tasksRepository;
 
+  Task getTaskFromID(List<Task> tasks, String taskId) {
+    return tasks.firstWhere((task) => task.id == taskId);
+  }
+
   void _onTitleChanged(
     EditSpendingTitleChanged event,
     Emitter<EditSpendingState> emit,
   ) {
+    if (!state.isTitleFieldCorrect && event.title.isNotEmpty) {
+      emit(state.copyWith(isTitleFieldCorrect: true));
+    }
     emit(state.copyWith(title: event.title));
   }
 
@@ -45,23 +54,42 @@ class EditSpendingBloc extends Bloc<EditSpendingEvent, EditSpendingState> {
     EditSpendingMoneyChanged event,
     Emitter<EditSpendingState> emit,
   ) {
+    if (!state.isMoneyFieldCorrect && event.money != 0) {
+      emit(state.copyWith(isMoneyFieldCorrect: true));
+    }
     emit(state.copyWith(money: event.money));
+  }
+
+  void _onTypeChanged(
+      EditSpendingTypeChanged event,
+      Emitter<EditSpendingState> emit,
+      ) {
+    if (state.spendingType == SpendingType.expenses) {
+      emit(state.copyWith(spendingType: SpendingType.income));
+    }
+    else{
+      emit(state.copyWith(spendingType: SpendingType.expenses));
+    }
   }
 
   Future<void> _onStartDateChanged(
     EditSpendingStartDateChanged event,
     Emitter<EditSpendingState> emit,
   ) async {
+    if (!state.isTimeFieldCorrect) {
+      emit(state.copyWith(isTimeFieldCorrect: true));
+    }
     emit(state.copyWith(startDate: event.startDate));
     final taskList = _tasksRepository.getDayTasks(event.startDate);
-    emit(state.copyWith(tasks: taskList, taskId: ''));
+    emit(state.copyWith(tasks: taskList, selectedTaskId: ''));
+
   }
 
   void _onTaskChanged(
     EditSpendingTaskChanged event,
     Emitter<EditSpendingState> emit,
   ) {
-    emit(state.copyWith(taskId: event.taskId));
+    emit(state.copyWith(selectedTaskId: event.selectedTaskId));
   }
 
   void _onSubjectChanged(
@@ -77,12 +105,30 @@ class EditSpendingBloc extends Bloc<EditSpendingEvent, EditSpendingState> {
   ) async {
     emit(state.copyWith(status: EditSpendingStatus.loading));
     final spending = (state.initialSpending ?? Spending(title: '', money: 0)).copyWith(
-      taskId: state.taskId,
+      taskId: state.selectedTaskId,
       title: state.title,
       money: state.money,
       startDate: state.startDate,
       subject: state.subject,
     );
+
+    bool isError = false;
+    if (spending.money == 0) {
+      emit(state.copyWith(isMoneyFieldCorrect: false));
+      isError = true;
+    }
+    if (spending.title.isEmpty) {
+      emit(state.copyWith(isTitleFieldCorrect: false));
+      isError = true;
+    }
+    if (spending.startDate == null) {
+      emit(state.copyWith(isTimeFieldCorrect: false));
+      isError = true;
+    }
+    if (isError) {
+      emit(state.copyWith(status: EditSpendingStatus.failure));
+      return;
+    }
 
     try {
       await _spendingsRepository.saveSpendings(spending);

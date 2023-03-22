@@ -17,6 +17,9 @@ class TasksRepository {
   /// Return [Task] in given DateTime.
   List<Task> getDayTasks(DateTime dateTime) => _tasksApi.getDayTasks(dateTime);
 
+  /// get Task from TaskID
+  Task? getTaskFromID(String? taskId) => _tasksApi.getTaskFromID(taskId);
+
   /// Saves a [task].
   /// If a [task] with the same id already exists, it will be replaced.
   Future<void> saveTask(Task task) => _tasksApi.saveTask(task);

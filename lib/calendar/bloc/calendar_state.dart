@@ -41,7 +41,6 @@ class CalendarState extends Equatable {
       lastDeletedTask: lastDeletedTask != null ? lastDeletedTask() : this.lastDeletedTask,
       selectedDay: selectedDay ?? this.selectedDay,
       focusedDay: focusedDay ?? this.focusedDay,
-      //calendarFormat: calendarFormat ?? this.calendarFormat,
       calendarFormat: calendarFormat ?? this.calendarFormat,
     );
   }

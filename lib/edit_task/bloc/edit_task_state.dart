@@ -4,9 +4,9 @@ enum EditTaskStatus { initial, loading, success, failure }
 
 extension EditTaskStatusX on EditTaskStatus {
   bool get isLoadingOrSuccess => [
-    EditTaskStatus.loading,
-    EditTaskStatus.success,
-  ].contains(this);
+        EditTaskStatus.loading,
+        EditTaskStatus.success,
+      ].contains(this);
 }
 
 class EditTaskState extends Equatable {
@@ -15,6 +15,8 @@ class EditTaskState extends Equatable {
     this.initialTask,
     this.title = '',
     this.description = '',
+    this.isTitleFieldCorrect = true,
+    this.isTimeFieldCorrect = true,
     this.startDate,
     this.endDate,
   });
@@ -22,6 +24,8 @@ class EditTaskState extends Equatable {
   final EditTaskStatus status;
   final Task? initialTask;
   final String title;
+  final bool isTitleFieldCorrect;
+  final bool isTimeFieldCorrect;
   final String description;
   final DateTime? startDate;
   final DateTime? endDate;
@@ -32,6 +36,8 @@ class EditTaskState extends Equatable {
     EditTaskStatus? status,
     Task? initialTask,
     String? title,
+    bool? isTitleFieldCorrect,
+    bool? isTimeFieldCorrect,
     String? description,
     DateTime? startDate,
     DateTime? endDate,
@@ -40,6 +46,8 @@ class EditTaskState extends Equatable {
       status: status ?? this.status,
       initialTask: initialTask ?? this.initialTask,
       title: title ?? this.title,
+      isTitleFieldCorrect: isTitleFieldCorrect ?? this.isTitleFieldCorrect,
+      isTimeFieldCorrect: isTimeFieldCorrect ?? this.isTimeFieldCorrect,
       description: description ?? this.description,
       startDate: startDate ?? this.startDate,
       endDate: endDate ?? this.endDate,
@@ -47,6 +55,6 @@ class EditTaskState extends Equatable {
   }
 
   @override
-  List<Object?> get props => [status, initialTask, title, description, startDate, endDate];
+  List<Object?> get props =>
+      [status, initialTask, title, description, startDate, endDate, isTitleFieldCorrect, isTimeFieldCorrect];
 }
-

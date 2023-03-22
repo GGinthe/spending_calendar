@@ -28,7 +28,10 @@ class EditTaskPage extends StatelessWidget {
     return BlocListener<EditTaskBloc, EditTaskState>(
       listenWhen: (previous, current) =>
           previous.status != current.status && current.status == EditTaskStatus.success,
-      listener: (context, state) => Navigator.of(context).pop(),
+      listener: (context, state) {
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('創建成功')));
+        Navigator.of(context).pop();
+      },
       child: const EditTaskView(),
     );
   }
@@ -91,23 +94,38 @@ class _TitleField extends StatelessWidget {
   Widget build(BuildContext context) {
     final state = context.watch<EditTaskBloc>().state;
     final hintText = state.initialTask?.title ?? '';
+    const maxLength = 25;
+    final textLength = state.title.length;
 
-    return TextFormField(
-      key: const Key('editTaskView_title_textFormField'),
-      initialValue: state.title,
-      decoration: InputDecoration(
-        enabled: !state.status.isLoadingOrSuccess,
-        labelText: '標題',
-        hintText: hintText,
-      ),
-      maxLength: 50,
-      inputFormatters: [
-        LengthLimitingTextInputFormatter(50),
-        //FilteringTextInputFormatter.allow(RegExp(r'[a-zA-Z\d\s]')),
+    return Column(
+      children: [
+        TextFormField(
+          key: const Key('editTaskView_title_textFormField'),
+          initialValue: state.title,
+          decoration: InputDecoration(
+            enabled: !state.status.isLoadingOrSuccess,
+            labelText: '標題',
+            hintText: hintText,
+            suffixText: '${textLength.toString()}/${maxLength.toString()}',
+            counterText: "",
+          ),
+          style: const TextStyle(fontSize: 20),
+          maxLength: maxLength,
+          inputFormatters: [
+            LengthLimitingTextInputFormatter(maxLength),
+            //FilteringTextInputFormatter.allow(RegExp(r'[a-zA-Z\d\s]')),
+          ],
+          onChanged: (value) {
+            context.read<EditTaskBloc>().add(EditTaskTitleChanged(value));
+          },
+        ),
+        if (!state.isTitleFieldCorrect) ...[
+          const Text(
+            '標題無法空白',
+            style: TextStyle(color: Colors.red),
+          ),
+        ],
       ],
-      onChanged: (value) {
-        context.read<EditTaskBloc>().add(EditTaskTitleChanged(value));
-      },
     );
   }
 }
@@ -119,6 +137,8 @@ class _DescriptionField extends StatelessWidget {
   Widget build(BuildContext context) {
     final state = context.watch<EditTaskBloc>().state;
     final hintText = state.initialTask?.description ?? '';
+    const maxLength = 200;
+    final textLength = state.description.length;
 
     return TextFormField(
       key: const Key('editTaskView_description_textFormField'),
@@ -127,11 +147,14 @@ class _DescriptionField extends StatelessWidget {
         enabled: !state.status.isLoadingOrSuccess,
         labelText: '描述',
         hintText: hintText,
+        suffixText: '${textLength.toString()}/${maxLength.toString()}',
+        counterText: "",
       ),
-      maxLength: 300,
-      maxLines: 7,
+      style: const TextStyle(fontSize: 20),
+      maxLength: maxLength,
+      maxLines: 5,
       inputFormatters: [
-        LengthLimitingTextInputFormatter(300),
+        LengthLimitingTextInputFormatter(maxLength),
       ],
       onChanged: (value) {
         context.read<EditTaskBloc>().add(EditTaskDescriptionChanged(value));
@@ -146,35 +169,38 @@ class _StartDatePicker extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final state = context.watch<EditTaskBloc>().state;
-    //final startDate = state.initialTask?.startDate;
     final DateTime? startDate = state.startDate;
-    /*DateTime? initialDate;
-    if (pickerDate != null) {
-      initialDate = pickerDate;
-    } else if (startDate != null) {
-      initialDate = startDate;
-    }*/
     final initialStartText =
-    startDate == null ? '請選擇日期' : DateFormat('yyyy 年 MM 月 dd 日 – kk 點 mm 分').format(startDate);
+        startDate == null ? '請選擇日期' : DateFormat('yyyy 年 MM 月 dd 日 – kk 點 mm 分').format(startDate);
 
-    return TextFormField(
-      key: Key(initialStartText),
-      initialValue: initialStartText,
-      decoration: InputDecoration(
-        enabled: !state.status.isLoadingOrSuccess,
-        labelText: '開始日期',
-        hintText: 'hintText',
-      ),
-      readOnly: true,
-      onTap: () async {
-        DateTime? pickerDate = await showOmniDateTimePicker(
-          context: context,
-          initialDate: startDate,
-        );
-        if (context.mounted && pickerDate != null) {
-          context.read<EditTaskBloc>().add(EditTaskStartDateChanged(pickerDate));
-        }
-      },
+    return Column(
+      children: [
+        TextFormField(
+          key: Key(initialStartText),
+          initialValue: initialStartText,
+          decoration: InputDecoration(
+            enabled: !state.status.isLoadingOrSuccess,
+            labelText: '開始日期',
+          ),
+          readOnly: true,
+          style: const TextStyle(fontSize: 20),
+          onTap: () async {
+            DateTime? pickerDate = await showOmniDateTimePicker(
+              context: context,
+              initialDate: startDate,
+            );
+            if (context.mounted && pickerDate != null) {
+              context.read<EditTaskBloc>().add(EditTaskStartDateChanged(pickerDate));
+            }
+          },
+        ),
+        if (!state.isTimeFieldCorrect) ...[
+          const Text(
+            '請選擇時間',
+            style: TextStyle(color: Colors.red),
+          ),
+        ],
+      ],
     );
   }
 }
@@ -185,34 +211,38 @@ class _EndDatePicker extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final state = context.watch<EditTaskBloc>().state;
-    //final endDate = state.initialTask?.endDate;
     final endDate = state.endDate;
-    /*DateTime? initialDate;
-    if (pickerDate != null) {
-      initialDate = pickerDate;
-    } else if (endDate != null) {
-      initialDate = endDate;
-    }*/
     final initialEndText =
-    endDate == null ? '請選擇日期' : DateFormat('yyyy 年 MM 月 dd 日 – kk 點 mm 分').format(endDate);
-    return TextFormField(
-      key: Key(initialEndText),
-      initialValue: initialEndText,
-      decoration: InputDecoration(
-        enabled: !state.status.isLoadingOrSuccess,
-        labelText: '結束日期',
-        hintText: 'hintText',
-      ),
-      readOnly: true,
-      onTap: () async {
-        DateTime? pickerDate = await showOmniDateTimePicker(
-          context: context,
-          initialDate: endDate,
-        );
-        if (context.mounted && pickerDate != null) {
-          context.read<EditTaskBloc>().add(EditTaskEndDateChanged(pickerDate));
-        }
-      },
+        endDate == null ? '請選擇日期' : DateFormat('yyyy 年 MM 月 dd 日 – kk 點 mm 分').format(endDate);
+
+    return Column(
+      children: [
+        TextFormField(
+          key: Key(initialEndText),
+          initialValue: initialEndText,
+          decoration: InputDecoration(
+            enabled: !state.status.isLoadingOrSuccess,
+            labelText: '結束日期',
+          ),
+          readOnly: true,
+          style: const TextStyle(fontSize: 20),
+          onTap: () async {
+            DateTime? pickerDate = await showOmniDateTimePicker(
+              context: context,
+              initialDate: endDate,
+            );
+            if (context.mounted && pickerDate != null) {
+              context.read<EditTaskBloc>().add(EditTaskEndDateChanged(pickerDate));
+            }
+          },
+        ),
+        if (!state.isTimeFieldCorrect) ...[
+          const Text(
+            '請選擇時間',
+            style: TextStyle(color: Colors.red),
+          ),
+        ],
+      ],
     );
   }
 }

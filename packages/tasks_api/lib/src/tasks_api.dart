@@ -13,6 +13,9 @@ abstract class TasksApi {
   /// Return [Task] in given DateTime.
   List<Task> getDayTasks(DateTime dateTime);
 
+  /// get Task from TaskID
+  Task? getTaskFromID(String? taskId);
+
   /// If a [task] with the same id already exists, it will be replaced.
   Future<void> saveTask(Task task);
 

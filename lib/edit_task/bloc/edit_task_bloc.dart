@@ -33,6 +33,9 @@ class EditTaskBloc extends Bloc<EditTaskEvent, EditTaskState> {
     EditTaskTitleChanged event,
     Emitter<EditTaskState> emit,
   ) {
+    if (!state.isTitleFieldCorrect && event.title.isNotEmpty) {
+      emit(state.copyWith(isTitleFieldCorrect: true));
+    }
     emit(state.copyWith(title: event.title));
   }
 
@@ -48,6 +51,11 @@ class EditTaskBloc extends Bloc<EditTaskEvent, EditTaskState> {
     Emitter<EditTaskState> emit,
   ) {
     emit(state.copyWith(startDate: event.startDate));
+
+    if (!state.isTimeFieldCorrect) {
+      emit(state.copyWith(isTimeFieldCorrect: true));
+    }
+
     if (state.endDate == null) {
       emit(state.copyWith(endDate: event.startDate.add(const Duration(hours: 1))));
     }
@@ -62,6 +70,11 @@ class EditTaskBloc extends Bloc<EditTaskEvent, EditTaskState> {
     Emitter<EditTaskState> emit,
   ) {
     emit(state.copyWith(endDate: event.endDate));
+
+    if (!state.isTimeFieldCorrect) {
+      emit(state.copyWith(isTimeFieldCorrect: true));
+    }
+
     if (state.startDate == null) {
       emit(state.copyWith(startDate: event.endDate.subtract(const Duration(hours: 1))));
     }
@@ -82,7 +95,20 @@ class EditTaskBloc extends Bloc<EditTaskEvent, EditTaskState> {
       startDate: state.startDate,
       endDate: state.endDate,
     );
+    bool isError = false;
 
+    if (task.title.isEmpty) {
+      emit(state.copyWith(isTitleFieldCorrect: false));
+      isError = true;
+    }
+    if (task.startDate == null) {
+      emit(state.copyWith(isTimeFieldCorrect: false));
+      isError = true;
+    }
+    if (isError) {
+      emit(state.copyWith(status: EditTaskStatus.failure));
+      return;
+    }
     try {
       await _tasksRepository.saveTask(task);
       emit(state.copyWith(status: EditTaskStatus.success));

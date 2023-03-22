@@ -8,12 +8,19 @@ abstract class EditSpendingEvent extends Equatable {
 }
 
 class EditSpendingTaskChanged extends EditSpendingEvent {
-  const EditSpendingTaskChanged(this.taskId);
+  const EditSpendingTaskChanged(this.selectedTaskId);
 
-  final String? taskId;
+  final String? selectedTaskId;
 
   @override
-  List<Object> get props => [taskId ?? ''];
+  List<Object> get props => [selectedTaskId ?? ''];
+}
+
+class EditSpendingTypeChanged extends EditSpendingEvent {
+  const EditSpendingTypeChanged();
+
+  @override
+  List<Object> get props => [];
 }
 
 class EditSpendingTitleChanged extends EditSpendingEvent {
