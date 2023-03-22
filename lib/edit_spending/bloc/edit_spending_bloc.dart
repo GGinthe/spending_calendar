@@ -61,13 +61,12 @@ class EditSpendingBloc extends Bloc<EditSpendingEvent, EditSpendingState> {
   }
 
   void _onTypeChanged(
-      EditSpendingTypeChanged event,
-      Emitter<EditSpendingState> emit,
-      ) {
+    EditSpendingTypeChanged event,
+    Emitter<EditSpendingState> emit,
+  ) {
     if (state.spendingType == SpendingType.expenses) {
       emit(state.copyWith(spendingType: SpendingType.income));
-    }
-    else{
+    } else {
       emit(state.copyWith(spendingType: SpendingType.expenses));
     }
   }
@@ -82,7 +81,6 @@ class EditSpendingBloc extends Bloc<EditSpendingEvent, EditSpendingState> {
     emit(state.copyWith(startDate: event.startDate));
     final taskList = _tasksRepository.getDayTasks(event.startDate);
     emit(state.copyWith(tasks: taskList, selectedTaskId: ''));
-
   }
 
   void _onTaskChanged(
@@ -107,7 +105,7 @@ class EditSpendingBloc extends Bloc<EditSpendingEvent, EditSpendingState> {
     final spending = (state.initialSpending ?? Spending(title: '', money: 0)).copyWith(
       taskId: state.selectedTaskId,
       title: state.title,
-      money: state.money,
+      money: state.spendingType == SpendingType.income ? state.money : state.money * -1,
       startDate: state.startDate,
       subject: state.subject,
     );
