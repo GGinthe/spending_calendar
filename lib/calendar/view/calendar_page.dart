@@ -101,11 +101,57 @@ class _TableCalendar extends StatelessWidget {
 
     return TableCalendar(
       focusedDay: focusedDayState,
-      firstDay: DateTime(2000),
-      lastDay: DateTime(2100),
+      firstDay: DateTime(2005),
+      lastDay: DateTime(2085),
       calendarFormat: calendarFormatState,
       locale: 'zh_CN',
       eventLoader: getTasksForDay,
+      daysOfWeekHeight: 20.0,
+      rowHeight: 48.0,
+      pageJumpingEnabled: true,
+      availableCalendarFormats: const {
+        CalendarFormat.month: '月檢視',
+        CalendarFormat.week: '週檢視',
+      },
+      calendarBuilders: CalendarBuilders(markerBuilder: (context, day, events) {
+        final markerText = events.length < 10 ? events.length.toString() : '9+';
+        if (day.month == selectedDayState.month) {
+          return Container(
+            width: 40,
+            height: 15,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(30.0),
+              color: const Color(0x8777E3FF),
+            ),
+            child: Text(
+              markerText,
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                color: Colors.black,
+                fontSize: 14.0,
+              ),
+            ),
+          );
+        } else {
+          return const SizedBox();
+        }
+      }),
+      calendarStyle: CalendarStyle(
+        markersAutoAligned: false,
+        markersAlignment: const Alignment(0, 0.9),
+        tableBorder: TableBorder.all(width: 0.8, color: Colors.grey),
+        cellMargin: const EdgeInsets.fromLTRB(3, 3, 3, 16),
+        cellAlignment: const Alignment(0, -0.7),
+        todayDecoration: BoxDecoration(
+          shape: BoxShape.rectangle,
+          borderRadius: BorderRadius.circular(15),
+          color: const Color(0x64330F8B),
+        ),
+        selectedDecoration: const BoxDecoration(
+          shape: BoxShape.rectangle,
+          color: Color(0xB1330F8B),
+        ),
+      ),
       selectedDayPredicate: (day) {
         // Use to determine which day is currently selected.
         // If this returns true, then `day` will be marked as selected.

@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-//import 'package:spending_calendar/edit_spending/edit_spending_view.dart';
+
 import 'package:spending_calendar/book/book.dart';
 import 'package:spending_repository/spending_repository.dart';
 import 'package:table_calendar/table_calendar.dart';
@@ -51,7 +51,8 @@ class BookViews extends StatelessWidget {
           ),
           BlocListener<BookBloc, BookState>(
             listenWhen: (previous, current) =>
-            previous.lastDeletedSpending != current.lastDeletedSpending && current.lastDeletedSpending != null,
+                previous.lastDeletedSpending != current.lastDeletedSpending &&
+                current.lastDeletedSpending != null,
             listener: (context, state) {
               final deletedSpending = state.lastDeletedSpending!;
               final messenger = ScaffoldMessenger.of(context);
@@ -84,39 +85,84 @@ class BookViews extends StatelessWidget {
               return state.getDaySpendings(day).toList();
             }
 
-            List<Spending> selectedDaySpending = getSpendingsForDay(selectedDayState);
-
             return Column(
               children: [
                 TableCalendar(
                   focusedDay: focusedDayState,
-                  firstDay: DateTime(2000),
-                  lastDay: DateTime(2100),
+                  firstDay: DateTime(2005),
+                  lastDay: DateTime(2085),
                   calendarFormat: calendarFormatState,
                   locale: 'zh_CN',
                   eventLoader: getSpendingsForDay,
+                  daysOfWeekHeight: 20.0,
+                  rowHeight: 48.0,
+                  pageJumpingEnabled: true,
+                  availableCalendarFormats: const {
+                    CalendarFormat.month: '月檢視',
+                    CalendarFormat.week: '週檢視',
+                  },
+                  calendarBuilders: CalendarBuilders(
+                    markerBuilder: (context, day, events) {
+                      events as List<Spending>;
+                      final markerText = [for (var spending in events) spending.money]
+                          .fold<int>(0, (a, b) => a + b)
+                          .toString();
+                      if (day.month == selectedDayState.month) {
+                        return Container(
+                          width: 55,
+                          height: 15,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(30.0),
+                            color: const Color(0x8777E3FF),
+                          ),
+                          child: Text(
+                            markerText,
+                            textAlign: TextAlign.center,
+                            style: const TextStyle(
+                              color: Colors.black,
+                              fontSize: 14.0,
+                            ),
+                          ),
+                        );
+                      } else {
+                        return const SizedBox();
+                      }
+                    },
+                  ),
+                  calendarStyle: CalendarStyle(
+                    markersAutoAligned: false,
+                    markersAlignment: const Alignment(0, 0.9),
+                    tableBorder: TableBorder.all(width: 0.8, color: Colors.grey),
+                    cellMargin: const EdgeInsets.fromLTRB(3, 3, 3, 16),
+                    cellAlignment: const Alignment(0, -0.7),
+                    todayDecoration: BoxDecoration(
+                      shape: BoxShape.rectangle,
+                      borderRadius: BorderRadius.circular(15),
+                      color: const Color(0x64330F8B),
+                    ),
+                    selectedDecoration: const BoxDecoration(
+                      shape: BoxShape.rectangle,
+                      color: Color(0xB1330F8B),
+                    ),
+                  ),
                   selectedDayPredicate: (day) {
-                    // Use to determine which day is currently selected.
-                    // If this returns true, then `day` will be marked as selected.
                     return isSameDay(selectedDayState, day);
                   },
                   onDaySelected: (selectedDay, focusedDay) {
                     if (!isSameDay(selectedDayState, selectedDay)) {
-                      // Updating the selected day
                       context.read<BookBloc>().add(
-                        CalendarDaySelected(
-                          selectedDay: selectedDay,
-                          focusedDay: focusedDay,
-                        ),
-                      );
+                            CalendarDaySelected(
+                              selectedDay: selectedDay,
+                              focusedDay: focusedDay,
+                            ),
+                          );
                     }
                   },
                   onFormatChanged: (format) {
                     if (calendarFormatState != format) {
-                      // Updating book format
                       context.read<BookBloc>().add(
-                        CalendarFormatChanged(format),
-                      );
+                            CalendarFormatChanged(format),
+                          );
                     }
                   },
                   onPageChanged: (focusedDay) {
@@ -159,5 +205,3 @@ class BookViews extends StatelessWidget {
     );
   }
 }
-
-

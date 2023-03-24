@@ -10,7 +10,7 @@ class BookState extends Equatable {
     this.lastDeletedSpending,
     this.selectedDay,
     this.focusedDay,
-    this.calendarFormat = CalendarFormat.week,
+    this.calendarFormat = CalendarFormat.month,
   });
 
   final BookStatus status;
@@ -47,14 +47,12 @@ class BookState extends Equatable {
 
   @override
   List<Object?> get props => [
-    status,
-    spendings,
-    filter,
-    lastDeletedSpending,
-    selectedDay,
-    focusedDay,
-    calendarFormat,
-  ];
+        status,
+        spendings,
+        filter,
+        lastDeletedSpending,
+        selectedDay,
+        focusedDay,
+        calendarFormat,
+      ];
 }
-
-
