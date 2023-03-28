@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
+import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:spending_calendar/edit_spending/edit_spending.dart';
 import 'package:spending_repository/spending_repository.dart';
 import 'package:tasks_repository/tasks_repository.dart';
@@ -88,6 +89,7 @@ class EditSpendingView extends StatelessWidget {
                     ),
                   ],
                 ),
+                _MoneyValidate(),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
@@ -126,7 +128,7 @@ class _TitleField extends StatelessWidget {
           initialValue: state.title,
           decoration: InputDecoration(
             enabled: !state.status.isLoadingOrSuccess,
-            labelText: '標題',
+            labelText: '備註',
             hintText: hintText,
             suffixText: '${textLength.toString()}/${maxLength.toString()}',
             counterText: "",
@@ -141,14 +143,6 @@ class _TitleField extends StatelessWidget {
             context.read<EditSpendingBloc>().add(EditSpendingTitleChanged(value));
           },
         ),
-        if (!state.isTitleFieldCorrect) ...[
-          const Text(
-            '標題無法空白',
-            style: TextStyle(color: Colors.red),
-          ),
-        ] else ...[
-          const SizedBox(height: 15)
-        ],
       ],
     );
   }
@@ -169,40 +163,42 @@ class _MoneyField extends StatelessWidget {
       labelText = '支出';
     }
 
-    return Column(
-      children: [
-        TextFormField(
-          key: const Key('editSpendingView_money_textFormField'),
-          initialValue: state.money.toString(),
-          decoration: InputDecoration(
-            enabled: !state.status.isLoadingOrSuccess,
-            labelText: labelText,
-            hintText: hintText,
-            counterText: "",
-          ),
-          maxLength: maxLength,
-          style: const TextStyle(fontSize: 20),
-          keyboardType: TextInputType.number,
-          inputFormatters: [
-            LengthLimitingTextInputFormatter(maxLength),
-            FilteringTextInputFormatter.digitsOnly,
-            FilteringTextInputFormatter.deny(RegExp('^0+'))
-          ],
-          // Only numbers can be entered
-          onChanged: (value) {
-            context.read<EditSpendingBloc>().add(EditSpendingMoneyChanged(int.tryParse(value) ?? 0));
-          },
-        ),
-        if (!state.isMoneyFieldCorrect) ...[
-          const Text(
-            '花費無法為零',
-            style: TextStyle(color: Colors.red),
-          ),
-        ] else ...[
-          const SizedBox(height: 15)
-        ],
+    return TextFormField(
+      key: const Key('editSpendingView_money_textFormField'),
+      initialValue: state.money.toString(),
+      decoration: InputDecoration(
+        enabled: !state.status.isLoadingOrSuccess,
+        labelText: labelText,
+        hintText: hintText,
+        counterText: "",
+      ),
+      maxLength: maxLength,
+      style: const TextStyle(fontSize: 20),
+      keyboardType: TextInputType.number,
+      inputFormatters: [
+        LengthLimitingTextInputFormatter(maxLength),
+        FilteringTextInputFormatter.digitsOnly,
+        FilteringTextInputFormatter.deny(RegExp('^0+'))
       ],
+      // Only numbers can be entered
+      onChanged: (value) {
+        context.read<EditSpendingBloc>().add(EditSpendingMoneyChanged(int.tryParse(value) ?? 0));
+      },
     );
+  }
+}
+
+class _MoneyValidate extends StatelessWidget {
+  const _MoneyValidate();
+
+  @override
+  Widget build(BuildContext context) {
+    final state = context.watch<EditSpendingBloc>().state;
+    if (!state.isMoneyFieldCorrect) {
+      return const Text('花費無法為零', style: TextStyle(color: Colors.red), textAlign: TextAlign.center);
+    } else {
+      return const SizedBox(height: 15);
+    }
   }
 }
 
@@ -211,7 +207,6 @@ class _SpendingTypeButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final state = context.watch<EditSpendingBloc>().state;
     final spendingType = context.select((EditSpendingBloc bloc) => bloc.state.spendingType);
     String buttonText = '收入';
     if (spendingType == SpendingType.income) {
@@ -221,9 +216,8 @@ class _SpendingTypeButton extends StatelessWidget {
     }
 
     return ElevatedButton(
-        style: ElevatedButton.styleFrom(
-            padding: const EdgeInsets.all(10) //content padding inside button
-        ),
+        style: ElevatedButton.styleFrom(padding: const EdgeInsets.all(10) //content padding inside button
+            ),
         onPressed: () {
           context.read<EditSpendingBloc>().add(const EditSpendingTypeChanged());
         },
@@ -287,15 +281,27 @@ class _TaskDropDownButton extends StatelessWidget {
     final pickerTask = state.selectedTaskId == '' ? null : state.selectedTaskId;
     final taskList = state.tasks;
 
-    return DropdownButtonFormField<String>(
+    return DropdownButtonFormField2<String>(
       key: const Key('editSpendingView_task_dropdownButton'),
       decoration: InputDecoration(
         enabled: !state.status.isLoadingOrSuccess,
         labelText: '行程花費',
         labelStyle: const TextStyle(fontSize: 20),
+        //contentPadding: const EdgeInsets.only(top: 15, bottom:15),
       ),
-      //style: const TextStyle(fontSize: 20),
-      itemHeight: 50,
+      iconStyleData: const IconStyleData(
+        icon: Icon(
+          Icons.arrow_drop_down,
+          color: Colors.black45,
+        ),
+        iconSize: 30,
+      ),
+      buttonStyleData: const ButtonStyleData(
+        height: 30,
+      ),
+      dropdownStyleData: const DropdownStyleData(
+        maxHeight: 250,
+      ),
       items: taskList.isNotEmpty
           ? taskList.map((task) {
               return DropdownMenuItem(
@@ -307,9 +313,12 @@ class _TaskDropDownButton extends StatelessWidget {
             }).toList()
           : null,
       value: pickerTask,
-      iconSize: 30.0,
-      hint: const Text('請選擇行程'),
-      disabledHint: const Text('此日無行程'),
+      hint: const Text(
+        '請選擇行程',
+        style: TextStyle(fontSize: 20),
+        textAlign: TextAlign.right,
+      ),
+      disabledHint: const Text('此日無行程', style: TextStyle(fontSize: 20)),
       onChanged: (value) {
         context.read<EditSpendingBloc>().add(EditSpendingTaskChanged(value ?? ''));
       },
@@ -325,14 +334,24 @@ class _SubjectDropDownButton extends StatelessWidget {
     final state = context.watch<EditSpendingBloc>().state;
     final hintText = state.initialSpending?.subject ?? '其他';
     final itemList = ['其他', '1', '2', '3'];
-    return DropdownButtonFormField<String>(
+
+    return DropdownButtonFormField2<String>(
       key: const Key('editSpendingView_subject_dropdownButton'),
       decoration: InputDecoration(
         enabled: !state.status.isLoadingOrSuccess,
         labelText: '類別',
         labelStyle: const TextStyle(fontSize: 20),
       ),
-      itemHeight: 50,
+      iconStyleData: const IconStyleData(
+        icon: Icon(
+          Icons.arrow_drop_down,
+          color: Colors.black45,
+        ),
+        iconSize: 30,
+      ),
+      buttonStyleData: const ButtonStyleData(
+        height: 30,
+      ),
       isExpanded: true,
       items: itemList.map<DropdownMenuItem<String>>((String value) {
         return DropdownMenuItem<String>(
@@ -344,8 +363,7 @@ class _SubjectDropDownButton extends StatelessWidget {
         );
       }).toList(),
       value: hintText,
-      iconSize: 30.0,
-      hint: const Text('類別'),
+      hint: const Text('類別', style: TextStyle(fontSize: 20)),
       onChanged: (value) {
         context.read<EditSpendingBloc>().add(EditSpendingSubjectChanged(value ?? ''));
       },

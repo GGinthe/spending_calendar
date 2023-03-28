@@ -13,7 +13,6 @@ class BookSubscriptionRequested extends BookEvent {
   const BookSubscriptionRequested();
 }
 
-
 /// This deletes a Spending.
 class BookSpendingDeleted extends BookEvent {
   const BookSpendingDeleted(this.spending);
@@ -40,10 +39,8 @@ class BookSpendingFilterChanged extends BookEvent {
   List<Object> get props => [filter];
 }
 
-
 class CalendarDaySelected extends BookEvent {
-  const CalendarDaySelected(
-      {required this.selectedDay, required this.focusedDay});
+  const CalendarDaySelected({required this.selectedDay, required this.focusedDay});
 
   final DateTime selectedDay;
   final DateTime focusedDay;
@@ -61,4 +58,9 @@ class CalendarFormatChanged extends BookEvent {
   List<Object> get props => [calendarFormat];
 }
 
+class CalendarBalanceChanged extends BookEvent {
+  const CalendarBalanceChanged();
 
+  @override
+  List<Object> get props => [];
+}

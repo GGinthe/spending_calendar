@@ -21,6 +21,7 @@ class BookBloc extends Bloc<BookEvent, BookState> {
     on<BookSpendingFilterChanged>(_onFilterChanged);
     on<CalendarDaySelected>(_onCalendarDaySelected);
     on<CalendarFormatChanged>(_onCalendarFormatChanged);
+    on<CalendarBalanceChanged>(_onBalanceFormatChanged);
   }
 
   final SpendingRepository _spendingRepository;
@@ -84,5 +85,17 @@ class BookBloc extends Bloc<BookEvent, BookState> {
     Emitter<BookState> emit,
   ) {
     emit(state.copyWith(calendarFormat: event.calendarFormat));
+  }
+
+  void _onBalanceFormatChanged(
+      CalendarBalanceChanged event,
+      Emitter<BookState> emit,
+      ) {
+    if(state.balanceStatus == BalanceStatus.total){
+      emit(state.copyWith(balanceStatus: () => BalanceStatus.separate));
+    }
+    else{
+      emit(state.copyWith(balanceStatus: () => BalanceStatus.total));
+    }
   }
 }

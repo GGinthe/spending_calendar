@@ -76,6 +76,7 @@ class EditTaskView extends StatelessWidget {
               children: [
                 _TitleField(),
                 _DescriptionField(),
+                _SubjectButton(),
                 _StartDatePicker(),
                 _EndDatePicker(),
               ],
@@ -137,7 +138,7 @@ class _DescriptionField extends StatelessWidget {
   Widget build(BuildContext context) {
     final state = context.watch<EditTaskBloc>().state;
     final hintText = state.initialTask?.description ?? '';
-    const maxLength = 200;
+    const maxLength = 100;
     final textLength = state.description.length;
 
     return TextFormField(
@@ -145,20 +146,59 @@ class _DescriptionField extends StatelessWidget {
       initialValue: state.description,
       decoration: InputDecoration(
         enabled: !state.status.isLoadingOrSuccess,
-        labelText: '描述',
+        labelText: '備註',
         hintText: hintText,
         suffixText: '${textLength.toString()}/${maxLength.toString()}',
         counterText: "",
       ),
       style: const TextStyle(fontSize: 20),
       maxLength: maxLength,
-      maxLines: 5,
+      maxLines: 2,
       inputFormatters: [
         LengthLimitingTextInputFormatter(maxLength),
       ],
       onChanged: (value) {
         context.read<EditTaskBloc>().add(EditTaskDescriptionChanged(value));
       },
+    );
+  }
+}
+
+class _SubjectButton extends StatelessWidget {
+  const _SubjectButton();
+
+  @override
+  Widget build(BuildContext context) {
+    final selected = context.select((EditTaskBloc bloc) => bloc.state.subject);
+
+    Widget icon({required String text, required IconData icon}) {
+      return Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: InkResponse(
+          onTap: () {
+            context.read<EditTaskBloc>().add(EditTaskSubjectChanged(text));
+          },
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                icon,
+                color: selected == text ? Colors.red : null,
+              ),
+              Text(text, style: TextStyle(color: selected == text ? Colors.red : null)),
+            ],
+          ),
+        ),
+      );
+    }
+
+    return Row(
+      children: [
+        icon(text: "工作", icon: Icons.face),
+        icon(text: "活動", icon: Icons.local_movies),
+        icon(text: "娛樂", icon: Icons.local_pizza),
+        icon(text: "其他", icon: Icons.local_fire_department),
+      ],
     );
   }
 }

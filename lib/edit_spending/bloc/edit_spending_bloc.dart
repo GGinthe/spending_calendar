@@ -44,9 +44,6 @@ class EditSpendingBloc extends Bloc<EditSpendingEvent, EditSpendingState> {
     EditSpendingTitleChanged event,
     Emitter<EditSpendingState> emit,
   ) {
-    if (!state.isTitleFieldCorrect && event.title.isNotEmpty) {
-      emit(state.copyWith(isTitleFieldCorrect: true));
-    }
     emit(state.copyWith(title: event.title));
   }
 
@@ -113,10 +110,6 @@ class EditSpendingBloc extends Bloc<EditSpendingEvent, EditSpendingState> {
     bool isError = false;
     if (spending.money == 0) {
       emit(state.copyWith(isMoneyFieldCorrect: false));
-      isError = true;
-    }
-    if (spending.title.isEmpty) {
-      emit(state.copyWith(isTitleFieldCorrect: false));
       isError = true;
     }
     if (spending.startDate == null) {

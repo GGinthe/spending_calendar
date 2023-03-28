@@ -1,16 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:tasks_repository/tasks_repository.dart';
+import 'package:intl/intl.dart';
+import 'package:spending_repository/spending_repository.dart';
 
 class TaskListTile extends StatelessWidget {
   const TaskListTile({
     super.key,
-    required this.task,
+    required this.spending,
     this.onToggleCompleted,
     this.onDismissed,
     this.onTap,
   });
 
-  final Task task;
+  final Spending spending;
   final ValueChanged<bool>? onToggleCompleted;
   final DismissDirectionCallback? onDismissed;
   final VoidCallback? onTap;
@@ -21,7 +22,7 @@ class TaskListTile extends StatelessWidget {
     final captionColor = theme.textTheme.bodySmall?.color;
 
     return Dismissible(
-      key: Key('taskListTile_dismissible_${task.id}'),
+      key: Key('taskListTile_dismissible_${spending.id}'),
       onDismissed: onDismissed,
       direction: DismissDirection.endToStart,
       background: Container(
@@ -36,16 +37,16 @@ class TaskListTile extends StatelessWidget {
       child: ListTile(
         onTap: onTap,
         title: Text(
-          task.title,
+          spending.subject ?? '其他',
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
-          style: const TextStyle(
-                  color: Colors.black,
-                  //decoration: TextDecoration.lineThrough,
+          style: TextStyle(
+                  color: captionColor,
+                  decoration: TextDecoration.lineThrough,
                 ),
         ),
         subtitle: Text(
-          task.description,
+          DateFormat('yyyy 年 MM 月 dd 日').format(spending.startDate ?? DateTime.now()),
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
         ),

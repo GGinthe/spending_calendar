@@ -15,6 +15,7 @@ class EditTaskBloc extends Bloc<EditTaskEvent, EditTaskState> {
           EditTaskState(
             initialTask: initialTask,
             title: initialTask?.title ?? '',
+            subject: initialTask?.subject ?? '其他',
             description: initialTask?.description ?? '',
             startDate: initialTask?.startDate,
             endDate: initialTask?.endDate,
@@ -25,6 +26,7 @@ class EditTaskBloc extends Bloc<EditTaskEvent, EditTaskState> {
     on<EditTaskStartDateChanged>(_onStartDateChanged);
     on<EditTaskEndDateChanged>(_onEndDateChanged);
     on<EditTaskSubmitted>(_onSubmitted);
+    on<EditTaskSubjectChanged>(_onSubjectChanged);
   }
 
   final TasksRepository _tasksRepository;
@@ -44,6 +46,13 @@ class EditTaskBloc extends Bloc<EditTaskEvent, EditTaskState> {
     Emitter<EditTaskState> emit,
   ) {
     emit(state.copyWith(description: event.description));
+  }
+
+  void _onSubjectChanged(
+    EditTaskSubjectChanged event,
+    Emitter<EditTaskState> emit,
+  ) {
+    emit(state.copyWith(subject: event.subject));
   }
 
   void _onStartDateChanged(
@@ -92,11 +101,12 @@ class EditTaskBloc extends Bloc<EditTaskEvent, EditTaskState> {
     final task = (state.initialTask ?? Task(title: '')).copyWith(
       title: state.title,
       description: state.description,
+      subject: state.subject,
       startDate: state.startDate,
       endDate: state.endDate,
     );
-    bool isError = false;
 
+    bool isError = false;
     if (task.title.isEmpty) {
       emit(state.copyWith(isTitleFieldCorrect: false));
       isError = true;

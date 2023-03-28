@@ -14,6 +14,7 @@ class EditTaskState extends Equatable {
     this.status = EditTaskStatus.initial,
     this.initialTask,
     this.title = '',
+    this.subject = '其他',
     this.description = '',
     this.isTitleFieldCorrect = true,
     this.isTimeFieldCorrect = true,
@@ -24,6 +25,7 @@ class EditTaskState extends Equatable {
   final EditTaskStatus status;
   final Task? initialTask;
   final String title;
+  final String subject;
   final bool isTitleFieldCorrect;
   final bool isTimeFieldCorrect;
   final String description;
@@ -36,6 +38,7 @@ class EditTaskState extends Equatable {
     EditTaskStatus? status,
     Task? initialTask,
     String? title,
+    String? subject,
     bool? isTitleFieldCorrect,
     bool? isTimeFieldCorrect,
     String? description,
@@ -46,6 +49,7 @@ class EditTaskState extends Equatable {
       status: status ?? this.status,
       initialTask: initialTask ?? this.initialTask,
       title: title ?? this.title,
+      subject: subject ?? this.subject,
       isTitleFieldCorrect: isTitleFieldCorrect ?? this.isTitleFieldCorrect,
       isTimeFieldCorrect: isTimeFieldCorrect ?? this.isTimeFieldCorrect,
       description: description ?? this.description,
@@ -55,6 +59,15 @@ class EditTaskState extends Equatable {
   }
 
   @override
-  List<Object?> get props =>
-      [status, initialTask, title, description, startDate, endDate, isTitleFieldCorrect, isTimeFieldCorrect];
+  List<Object?> get props => [
+        status,
+        initialTask,
+        title,
+        subject,
+        description,
+        startDate,
+        endDate,
+        isTitleFieldCorrect,
+        isTimeFieldCorrect
+      ];
 }

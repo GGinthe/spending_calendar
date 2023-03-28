@@ -35,6 +35,7 @@ dependencies:
   table_calendar: ^3.0.3
   omni_datetime_picker: ^1.0.1
   syncfusion_flutter_calendar: ^20.4.53
+  dropdown_button2: ^2.0.0
 
 
 dev_dependencies:

@@ -25,6 +25,15 @@ class EditTaskDescriptionChanged extends EditTaskEvent {
   List<Object> get props => [description];
 }
 
+class EditTaskSubjectChanged extends EditTaskEvent {
+  const EditTaskSubjectChanged(this.subject);
+
+  final String subject;
+
+  @override
+  List<Object> get props => [subject];
+}
+
 class EditTaskStartDateChanged extends EditTaskEvent {
   const EditTaskStartDateChanged(this.startDate);
 

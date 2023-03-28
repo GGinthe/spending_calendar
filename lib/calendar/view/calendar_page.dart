@@ -115,7 +115,7 @@ class _TableCalendar extends StatelessWidget {
       },
       calendarBuilders: CalendarBuilders(markerBuilder: (context, day, events) {
         final markerText = events.length < 10 ? events.length.toString() : '9+';
-        if (day.month == selectedDayState.month) {
+        if (day.month == selectedDayState.month || calendarFormatState == CalendarFormat.week) {
           return Container(
             width: 40,
             height: 15,
@@ -177,7 +177,11 @@ class _TableCalendar extends StatelessWidget {
         }
       },
       onPageChanged: (focusedDay) {
-        focusedDayState = focusedDay;
+        //focusedDayState = focusedDay;
+        context.read<CalendarBloc>().add(CalendarDaySelected(
+              selectedDay: focusedDay,
+              focusedDay: focusedDay,
+            ));
       },
     );
   }
