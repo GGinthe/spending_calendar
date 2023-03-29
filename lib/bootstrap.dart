@@ -18,10 +18,10 @@ void bootstrap({required TasksApi tasksApi, required SpendingApi spendingApi}) {
   Bloc.observer = const AppBlocObserver();
 
   final tasksRepository = TasksRepository(tasksApi: tasksApi);
-  final spendingsRespository = SpendingRepository(spendingApi: spendingApi);
+  final spendingsRepository = SpendingRepository(spendingApi: spendingApi);
 
   runZonedGuarded(
-    () => runApp(App(tasksRepository: tasksRepository, spendingsRespository: spendingsRespository)),
+    () => runApp(App(tasksRepository: tasksRepository, spendingsRespository: spendingsRepository)),
     (error, stackTrace) => log(error.toString(), stackTrace: stackTrace),
   );
 }

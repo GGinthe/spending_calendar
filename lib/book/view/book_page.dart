@@ -1,10 +1,11 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:spending_calendar/book/book.dart';
+import 'package:spending_calendar/edit_spending/edit_spending_view.dart';
 import 'package:spending_repository/spending_repository.dart';
 import 'package:table_calendar/table_calendar.dart';
-import 'package:spending_calendar/book/widgets/stats_row.dart';
 
 class BookPage extends StatelessWidget {
   const BookPage({super.key});
@@ -80,6 +81,7 @@ class BookViews extends StatelessWidget {
             _TableCalendar(),
             SizedBox(height: 6.0),
             MoneyStatsRow(),
+            Expanded(child: _SpendingListView()),
           ],
         ),
       ),
@@ -181,6 +183,40 @@ class _TableCalendar extends StatelessWidget {
               focusedDay: focusedDay,
             ));
       },
+    );
+  }
+}
+
+class _SpendingListView extends StatelessWidget {
+  const _SpendingListView();
+
+  @override
+  Widget build(BuildContext context) {
+    final state = context.watch<BookBloc>().state;
+    final DateTime selectedDayState = state.selectedDay ?? DateTime.now();
+    List<Spending> getTasksForDay(DateTime day) {
+      return state.getDaySpendings(day).toList();
+    }
+
+    List<Spending> selectedDayTask = getTasksForDay(selectedDayState);
+    return CupertinoScrollbar(
+      child: ListView(
+        shrinkWrap: true,
+        children: [
+          for (final spending in selectedDayTask)
+            SpendingListTile(
+              spending: spending,
+              onDismissed: (_) {
+                context.read<BookBloc>().add(BookSpendingDeleted(spending));
+              },
+              onTap: () {
+                Navigator.of(context).push(
+                  EditSpendingPage.route(initialSpending: spending),
+                );
+              },
+            ),
+        ],
+      ),
     );
   }
 }

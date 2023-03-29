@@ -59,7 +59,7 @@ class MoneyStatsRow extends StatelessWidget {
             );
       },
       child: Container(
-        height: 70,
+        height: 60,
         decoration: const BoxDecoration(
           border: Border.symmetric(horizontal: BorderSide()),
         ),

@@ -202,18 +202,11 @@ class _TaskListView extends StatelessWidget {
     return CupertinoScrollbar(
       child: ListView(
         shrinkWrap: true,
+        controller: ScrollController(),
         children: [
           for (final task in selectedDayTask)
             TaskListTile(
               task: task,
-              onToggleCompleted: (isCompleted) {
-                context.read<CalendarBloc>().add(
-                      CalendarTaskCompletionToggled(
-                        task: task,
-                        isCompleted: isCompleted,
-                      ),
-                    );
-              },
               onDismissed: (_) {
                 context.read<CalendarBloc>().add(CalendarTaskDeleted(task));
               },

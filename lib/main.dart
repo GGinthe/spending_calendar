@@ -17,7 +17,3 @@ Future<void> main() async {
 
   bootstrap(tasksApi: todosApi, spendingApi: spendingApi);
 }
-
-//新增未顯示行事曆
-// 日期點選未顯示
-// 編輯日期未改變

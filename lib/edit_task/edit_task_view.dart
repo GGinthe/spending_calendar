@@ -179,10 +179,12 @@ class _SubjectButton extends StatelessWidget {
             context.read<EditTaskBloc>().add(EditTaskSubjectChanged(text));
           },
           child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             mainAxisSize: MainAxisSize.min,
             children: [
               Icon(
                 icon,
+                size: 40,
                 color: selected == text ? Colors.red : null,
               ),
               Text(text, style: TextStyle(color: selected == text ? Colors.red : null)),
@@ -194,10 +196,10 @@ class _SubjectButton extends StatelessWidget {
 
     return Row(
       children: [
-        icon(text: "工作", icon: Icons.face),
-        icon(text: "活動", icon: Icons.local_movies),
-        icon(text: "娛樂", icon: Icons.local_pizza),
-        icon(text: "其他", icon: Icons.local_fire_department),
+        icon(text: "工作", icon: Icons.work),
+        icon(text: "活動", icon: Icons.event),
+        icon(text: "提醒", icon: Icons.schedule),
+        icon(text: "其他", icon: Icons.bookmark),
       ],
     );
   }
@@ -227,6 +229,7 @@ class _StartDatePicker extends StatelessWidget {
           onTap: () async {
             DateTime? pickerDate = await showOmniDateTimePicker(
               context: context,
+              minutesInterval: 5,
               initialDate: startDate,
             );
             if (context.mounted && pickerDate != null) {
@@ -269,6 +272,7 @@ class _EndDatePicker extends StatelessWidget {
           onTap: () async {
             DateTime? pickerDate = await showOmniDateTimePicker(
               context: context,
+              minutesInterval: 5,
               initialDate: endDate,
             );
             if (context.mounted && pickerDate != null) {

@@ -333,7 +333,7 @@ class _SubjectDropDownButton extends StatelessWidget {
   Widget build(BuildContext context) {
     final state = context.watch<EditSpendingBloc>().state;
     final hintText = state.initialSpending?.subject ?? '其他';
-    final itemList = ['其他', '1', '2', '3'];
+    final itemList = ['其他', '早餐', '午餐', '晚餐', '飲品', '交通', '購物', '房租', '社交', '1', '2', '3'];
 
     return DropdownButtonFormField2<String>(
       key: const Key('editSpendingView_subject_dropdownButton'),
@@ -351,6 +351,9 @@ class _SubjectDropDownButton extends StatelessWidget {
       ),
       buttonStyleData: const ButtonStyleData(
         height: 30,
+      ),
+      dropdownStyleData: const DropdownStyleData(
+        maxHeight: 250,
       ),
       isExpanded: true,
       items: itemList.map<DropdownMenuItem<String>>((String value) {
