@@ -59,8 +59,10 @@ class CalendarFormatChanged extends BookEvent {
 }
 
 class CalendarBalanceChanged extends BookEvent {
-  const CalendarBalanceChanged();
+   const CalendarBalanceChanged(this.balanceStatus);
+
+   final BalanceStatus balanceStatus;
 
   @override
-  List<Object> get props => [];
+  List<Object> get props => [balanceStatus];
 }

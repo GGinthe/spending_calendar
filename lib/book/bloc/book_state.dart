@@ -2,7 +2,7 @@ part of 'book_bloc.dart';
 
 enum BookStatus { initial, loading, success, failure }
 
-enum BalanceStatus { total, separate }
+enum BalanceStatus { total, separate, income, expanse }
 
 class BookState extends Equatable {
   const BookState({

@@ -24,12 +24,14 @@ class EditSpendingBloc extends Bloc<EditSpendingEvent, EditSpendingState> {
             money: initialSpending?.money ?? 0,
           ),
         ) {
+    on<EditSpendingTaskInit>(_onInit);
     on<EditSpendingTaskChanged>(_onTaskChanged);
     on<EditSpendingTypeChanged>(_onTypeChanged);
     on<EditSpendingTitleChanged>(_onTitleChanged);
     on<EditSpendingMoneyChanged>(_onMoneyChanged);
     on<EditSpendingStartDateChanged>(_onStartDateChanged);
     on<EditSpendingSubjectChanged>(_onSubjectChanged);
+    on<EditSpendingIsExpandChanged>(_onExpandChanged);
     on<EditSpendingSubmitted>(_onSubmitted);
   }
 
@@ -38,6 +40,16 @@ class EditSpendingBloc extends Bloc<EditSpendingEvent, EditSpendingState> {
 
   Task getTaskFromID(List<Task> tasks, String taskId) {
     return tasks.firstWhere((task) => task.id == taskId);
+  }
+
+  void _onInit(
+    EditSpendingTaskInit event,
+    Emitter<EditSpendingState> emit,
+  ) {
+    if (state.startDate != null) {
+      final taskList = _tasksRepository.getDayTasks(state.startDate!);
+      emit(state.copyWith(tasks: taskList, selectedTaskId: state.selectedTaskId));
+    }
   }
 
   void _onTitleChanged(
@@ -61,6 +73,7 @@ class EditSpendingBloc extends Bloc<EditSpendingEvent, EditSpendingState> {
     EditSpendingTypeChanged event,
     Emitter<EditSpendingState> emit,
   ) {
+    emit(state.copyWith(subject: '其他'));
     if (state.spendingType == SpendingType.expenses) {
       emit(state.copyWith(spendingType: SpendingType.income));
     } else {
@@ -92,6 +105,17 @@ class EditSpendingBloc extends Bloc<EditSpendingEvent, EditSpendingState> {
     Emitter<EditSpendingState> emit,
   ) {
     emit(state.copyWith(subject: event.subject));
+  }
+
+  void _onExpandChanged(
+    EditSpendingIsExpandChanged event,
+    Emitter<EditSpendingState> emit,
+  ) {
+    if (state.isExpand == false) {
+      emit(state.copyWith(isExpand: true));
+    } else {
+      emit(state.copyWith(isExpand: false));
+    }
   }
 
   Future<void> _onSubmitted(

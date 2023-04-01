@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:spending_calendar/edit_task/edit_task_view.dart';
 import 'package:spending_calendar/calendar/calendar.dart';
+import 'package:spending_repository/spending_repository.dart';
 import 'package:tasks_repository/tasks_repository.dart';
 import 'package:table_calendar/table_calendar.dart';
 
@@ -13,6 +14,7 @@ class CalendarPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (context) => CalendarBloc(
+        spendingsRepository: context.read<SpendingRepository>(),
         tasksRepository: context.read<TasksRepository>(),
       )..add(const CalendarSubscriptionRequested()),
       child: const CalendarViews(),
@@ -203,20 +205,23 @@ class _TaskListView extends StatelessWidget {
       child: ListView(
         shrinkWrap: true,
         controller: ScrollController(),
-        children: [
-          for (final task in selectedDayTask)
-            TaskListTile(
-              task: task,
-              onDismissed: (_) {
-                context.read<CalendarBloc>().add(CalendarTaskDeleted(task));
-              },
-              onTap: () {
-                Navigator.of(context).push(
-                  EditTaskPage.route(initialTask: task),
-                );
-              },
-            ),
-        ],
+        children: ListTile.divideTiles(
+            context: context,
+            tiles: [
+              for (final task in selectedDayTask)
+                TaskListTile(
+                  task: task,
+                  onDismissed: (_) {
+                    context.read<CalendarBloc>().add(CalendarTaskDeleted(task));
+                  },
+                  onTap: () {
+                    Navigator.of(context).push(
+                      EditTaskPage.route(initialTask: task),
+                    );
+                  },
+                ),
+            ]
+        ).toList(),
       ),
     );
   }

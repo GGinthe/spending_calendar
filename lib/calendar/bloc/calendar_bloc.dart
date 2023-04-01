@@ -3,16 +3,20 @@ import 'dart:async';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:spending_calendar/calendar/calendar.dart';
+import 'package:spending_repository/spending_repository.dart';
 import 'package:tasks_repository/tasks_repository.dart';
 import 'package:table_calendar/table_calendar.dart';
 
 part 'calendar_event.dart';
+
 part 'calendar_state.dart';
 
 class CalendarBloc extends Bloc<CalendarEvent, CalendarState> {
   CalendarBloc({
+    required SpendingRepository spendingsRepository,
     required TasksRepository tasksRepository,
-  })  : _tasksRepository = tasksRepository,
+  })  : _spendingsRepository = spendingsRepository,
+        _tasksRepository = tasksRepository,
         super(const CalendarState()) {
     on<CalendarSubscriptionRequested>(_onSubscriptionRequested);
     on<CalendarTaskCompletionToggled>(_onTaskCompletionToggled);
@@ -26,6 +30,7 @@ class CalendarBloc extends Bloc<CalendarEvent, CalendarState> {
   }
 
   final TasksRepository _tasksRepository;
+  final SpendingRepository _spendingsRepository;
 
   Future<void> _onSubscriptionRequested(
     CalendarSubscriptionRequested event,
@@ -33,16 +38,28 @@ class CalendarBloc extends Bloc<CalendarEvent, CalendarState> {
   ) async {
     emit(state.copyWith(status: () => CalendarStatus.loading));
 
-    await emit.forEach<List<Task>>(
-      _tasksRepository.getTasks(),
-      onData: (tasks) => state.copyWith(
-        status: () => CalendarStatus.success,
-        tasks: () => tasks,
+    await Future.wait([
+      emit.forEach<List<Task>>(
+        _tasksRepository.getTasks(),
+        onData: (tasks) => state.copyWith(
+          status: () => CalendarStatus.success,
+          tasks: () => tasks,
+        ),
+        onError: (_, __) => state.copyWith(
+          status: () => CalendarStatus.failure,
+        ),
       ),
-      onError: (_, __) => state.copyWith(
-        status: () => CalendarStatus.failure,
-      ),
-    );
+      emit.forEach<List<Spending>>(
+        _spendingsRepository.getSpendings(),
+        onData: (spendings) => state.copyWith(
+          status: () => CalendarStatus.success,
+          spendings: () => spendings,
+        ),
+        onError: (_, __) => state.copyWith(
+          status: () => CalendarStatus.failure,
+        ),
+      )
+    ]);
   }
 
   Future<void> _onTaskCompletionToggled(

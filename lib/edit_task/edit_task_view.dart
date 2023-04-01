@@ -4,8 +4,11 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:spending_calendar/edit_task/edit_task.dart';
+import 'package:spending_repository/spending_repository.dart';
 import 'package:tasks_repository/tasks_repository.dart';
 import 'package:omni_datetime_picker/omni_datetime_picker.dart';
+import 'package:spending_calendar/icon_select.dart';
+import 'package:spending_calendar/book/widgets/spending_list_tile.dart';
 
 class EditTaskPage extends StatelessWidget {
   const EditTaskPage({super.key});
@@ -15,9 +18,10 @@ class EditTaskPage extends StatelessWidget {
       fullscreenDialog: true,
       builder: (context) => BlocProvider(
         create: (context) => EditTaskBloc(
+          spendingsRepository: context.read<SpendingRepository>(),
           tasksRepository: context.read<TasksRepository>(),
           initialTask: initialTask,
-        ),
+        )..add(const EditTaskSpendingInit()),
         child: const EditTaskPage(),
       ),
     );
@@ -68,20 +72,21 @@ class EditTaskView extends StatelessWidget {
         child:
             status.isLoadingOrSuccess ? const CupertinoActivityIndicator() : const Icon(Icons.check_rounded),
       ),
-      body: const CupertinoScrollbar(
-        child: SingleChildScrollView(
-          child: Padding(
-            padding: EdgeInsets.all(16),
-            child: Column(
-              children: [
-                _TitleField(),
-                _DescriptionField(),
-                _SubjectButton(),
-                _StartDatePicker(),
-                _EndDatePicker(),
-              ],
+      body: const Padding(
+        padding: EdgeInsets.all(16),
+        child: Column(
+          children: [
+            _TitleField(),
+            _DescriptionField(),
+            _SubjectButton(),
+            _StartDatePicker(),
+            _EndDatePicker(),
+            SizedBox(height: 15),
+            Expanded(
+              child: _SpendingListView(),
             ),
-          ),
+            SizedBox(height: 40)
+          ],
         ),
       ),
     );
@@ -171,7 +176,7 @@ class _SubjectButton extends StatelessWidget {
   Widget build(BuildContext context) {
     final selected = context.select((EditTaskBloc bloc) => bloc.state.subject);
 
-    Widget icon({required String text, required IconData icon}) {
+    Widget icon(String text) {
       return Padding(
         padding: const EdgeInsets.all(8.0),
         child: InkResponse(
@@ -182,11 +187,7 @@ class _SubjectButton extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(
-                icon,
-                size: 40,
-                color: selected == text ? Colors.red : null,
-              ),
+              editTaskIcon(text, selected == text),
               Text(text, style: TextStyle(color: selected == text ? Colors.red : null)),
             ],
           ),
@@ -196,10 +197,10 @@ class _SubjectButton extends StatelessWidget {
 
     return Row(
       children: [
-        icon(text: "工作", icon: Icons.work),
-        icon(text: "活動", icon: Icons.event),
-        icon(text: "提醒", icon: Icons.schedule),
-        icon(text: "其他", icon: Icons.bookmark),
+        icon("工作"),
+        icon("活動"),
+        icon("提醒"),
+        icon("其他"),
       ],
     );
   }
@@ -287,6 +288,28 @@ class _EndDatePicker extends StatelessWidget {
           ),
         ],
       ],
+    );
+  }
+}
+
+class _SpendingListView extends StatelessWidget {
+  const _SpendingListView();
+
+  @override
+  Widget build(BuildContext context) {
+    final state = context.watch<EditTaskBloc>().state;
+    final spendings = state.spendings;
+
+    return CupertinoScrollbar(
+      child: ListView(
+        shrinkWrap: true,
+        children: ListTile.divideTiles(context: context, tiles: [
+          for (final spending in spendings)
+            SpendingListTile(
+              spending: spending,
+            ),
+        ]).toList(),
+      ),
     );
   }
 }

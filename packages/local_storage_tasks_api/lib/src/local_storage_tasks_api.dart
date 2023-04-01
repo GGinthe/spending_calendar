@@ -33,21 +33,17 @@ class LocalStorageTasksApi extends TasksApi {
 
   Future<void> _setValue(String key, String value) => _plugin.setString(key, value);
 
-  /// Task
-  late List<Task> tasks;
-
   /// get json from local storage.
   /// If first time, create an empty json.
   /// Add task to stream
   void _init() {
     final tasksJson = _getValue(kTasksCollectionKey);
     if (tasksJson != null) {
-      tasks = List<Map<dynamic, dynamic>>.from(
+      final tasks = List<Map<dynamic, dynamic>>.from(
         json.decode(tasksJson) as List,
       ).map((jsonMap) => Task.fromJson(Map<String, dynamic>.from(jsonMap))).toList();
       _taskStreamController.add(tasks);
     } else {
-      tasks = [];
       _taskStreamController.add(const []);
     }
   }
@@ -57,6 +53,7 @@ class LocalStorageTasksApi extends TasksApi {
 
   @override
   Future<void> saveTask(Task task) {
+    final tasks = [..._taskStreamController.value];
     final taskIndex = tasks.indexWhere((t) => t.id == task.id);
     if (taskIndex >= 0) {
       tasks[taskIndex] = task;
@@ -69,6 +66,7 @@ class LocalStorageTasksApi extends TasksApi {
 
   @override
   Future<void> deepDeleteTask(String id) async {
+    final tasks = [..._taskStreamController.value];
     final taskIndex = tasks.indexWhere((t) => t.id == id);
     if (taskIndex == -1) {
       throw TaskNotFoundException();
@@ -81,6 +79,7 @@ class LocalStorageTasksApi extends TasksApi {
 
   @override
   Future<int> deepDeleteAll({required bool isDeleted}) async {
+    final tasks = [..._taskStreamController.value];
     final deletedTasksAmount = tasks.where((t) => t.isDeleted).length;
     tasks.removeWhere((t) => t.isDeleted);
     _taskStreamController.add(tasks);
@@ -90,6 +89,7 @@ class LocalStorageTasksApi extends TasksApi {
 
   @override
   Future<int> clearCompleted() async {
+    final tasks = [..._taskStreamController.value];
     final completedTasksAmount = tasks.where((t) => t.isCompleted).length;
     tasks.removeWhere((t) => t.isCompleted);
     _taskStreamController.add(tasks);
@@ -99,6 +99,7 @@ class LocalStorageTasksApi extends TasksApi {
 
   @override
   Future<int> completeAll({required bool isCompleted}) async {
+    final tasks = [..._taskStreamController.value];
     final changedTasksAmount = tasks.where((t) => t.isCompleted != isCompleted).length;
     final newTasks = [for (final task in tasks) task.copyWith(isCompleted: isCompleted)];
     _taskStreamController.add(newTasks);
@@ -106,13 +107,27 @@ class LocalStorageTasksApi extends TasksApi {
     return changedTasksAmount;
   }
 
+  bool _isBetween(DateTime? startTime, DateTime? endTime, DateTime betweenTime) {
+    if (startTime == null || endTime == null) {
+      return false;
+    }
+    if (startTime.isBefore(betweenTime) && endTime.isAfter(betweenTime)) {
+      return true;
+    } else if (DateUtils.isSameDay(startTime, betweenTime) || DateUtils.isSameDay(endTime, betweenTime)) {
+      return true;
+    }
+    return false;
+  }
+
   @override
   List<Task> getDayTasks(DateTime dateTime) {
-    return tasks.where((task) => DateUtils.isSameDay(task.startDate, dateTime)).toList();
+    final tasks = [..._taskStreamController.value];
+    return tasks.where((task) => _isBetween(task.startDate, task.endDate, dateTime)).toList();
   }
 
   @override
   Task? getTaskFromID(String? taskId) {
+    final tasks = [..._taskStreamController.value];
     if (taskId == null || taskId == '') {
       return null;
     }

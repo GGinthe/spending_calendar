@@ -6,6 +6,7 @@ class CalendarState extends Equatable {
   const CalendarState({
     this.status = CalendarStatus.initial,
     this.tasks = const [],
+    this.spendings = const [],
     this.filter = CalendarTasksFilter.all,
     this.lastDeletedTask,
     this.selectedDay,
@@ -15,6 +16,7 @@ class CalendarState extends Equatable {
 
   final CalendarStatus status;
   final List<Task> tasks;
+  final List<Spending> spendings;
   final CalendarTasksFilter filter;
   final Task? lastDeletedTask;
   final DateTime? selectedDay;
@@ -25,9 +27,18 @@ class CalendarState extends Equatable {
 
   Iterable<Task> getDayTasks(DateTime datetime) => filter.getDayTasks(tasks, datetime);
 
+  Iterable<Spending> getDaySpendings(DateTime dateTime) {
+    return spendings.where((spending) => isSameDay(spending.startDate, dateTime));
+  }
+
+  Iterable<Spending> getSpendingsFromTaskID(String taskId) {
+    return spendings.where((spending) => spending.taskId == taskId);
+  }
+
   CalendarState copyWith({
     CalendarStatus Function()? status,
     List<Task> Function()? tasks,
+    List<Spending> Function()? spendings,
     CalendarTasksFilter Function()? filter,
     Task? Function()? lastDeletedTask,
     DateTime? selectedDay,
@@ -37,6 +48,7 @@ class CalendarState extends Equatable {
     return CalendarState(
       status: status != null ? status() : this.status,
       tasks: tasks != null ? tasks() : this.tasks,
+      spendings: spendings != null ? spendings() : this.spendings,
       filter: filter != null ? filter() : this.filter,
       lastDeletedTask: lastDeletedTask != null ? lastDeletedTask() : this.lastDeletedTask,
       selectedDay: selectedDay ?? this.selectedDay,
@@ -49,6 +61,7 @@ class CalendarState extends Equatable {
   List<Object?> get props => [
         status,
         tasks,
+        spendings,
         filter,
         lastDeletedTask,
         selectedDay,

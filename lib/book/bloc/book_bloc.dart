@@ -91,10 +91,6 @@ class BookBloc extends Bloc<BookEvent, BookState> {
     CalendarBalanceChanged event,
     Emitter<BookState> emit,
   ) {
-    if (state.balanceStatus == BalanceStatus.total) {
-      emit(state.copyWith(balanceStatus: () => BalanceStatus.separate));
-    } else {
-      emit(state.copyWith(balanceStatus: () => BalanceStatus.total));
-    }
+    emit(state.copyWith(balanceStatus: () => event.balanceStatus));
   }
 }

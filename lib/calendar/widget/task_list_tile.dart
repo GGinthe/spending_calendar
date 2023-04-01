@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:tasks_repository/tasks_repository.dart';
+import 'package:spending_calendar/icon_select.dart';
+
+import '../bloc/calendar_bloc.dart';
 
 class TaskListTile extends StatelessWidget {
   const TaskListTile({
@@ -17,6 +21,10 @@ class TaskListTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final state = context.watch<CalendarBloc>().state;
+    final taskSpending = state.getSpendingsFromTaskID(task.id);
+    final taskMoney = [for (var spending in taskSpending) spending.money].fold<int>(0, (a, b) => a + b);
+    final moneyColor = taskMoney > 0 ? Colors.green : taskMoney == 0 ? Colors.black : Colors.red;
 
     return Dismissible(
       key: Key('taskListTile_dismissible_${task.id}'),
@@ -42,6 +50,8 @@ class TaskListTile extends StatelessWidget {
             fontSize: 18,
           ),
         ),
+        dense: true,
+        visualDensity: const VisualDensity(vertical: 0),
         subtitle: Text(
           dateFormat(task.startDate!, task.endDate!),
           maxLines: 1,
@@ -51,8 +61,14 @@ class TaskListTile extends StatelessWidget {
             fontSize: 14,
           ),
         ),
-        leading: subjectIcon(task.subject ?? '其他'),
-        trailing: onTap == null ? null : const Icon(Icons.chevron_right),
+        leading: taskIcon(task.subject ?? '其他'),
+        trailing: Text(
+          moneyFormatString(taskMoney),
+          style: TextStyle(
+            color: moneyColor,
+            fontSize: 18,
+          ),
+        ),
       ),
     );
   }
@@ -64,15 +80,22 @@ String dateFormat(DateTime startDate, DateTime endDate) {
   return '$startText ~ $endText';
 }
 
-Widget subjectIcon(String subject) {
-  if (subject == '工作') {
-    return const Icon(Icons.work, size: 30);
-  } else if (subject == '活動') {
-    return const Icon(Icons.event, size: 30);
-  } else if (subject == '提醒') {
-    return const Icon(Icons.schedule, size: 30);
-  } else if (subject == '其他') {
-    return const Icon(Icons.bookmark, size: 30);
+String moneyFormatString(int money) {
+  final moneyI = money < 0 ? money * -1 : money;
+  String moneyString = moneyI.toStringAsFixed(0);
+  if (moneyI > 9999999999) {
+    moneyString = '99+ 億';
+  } else if (moneyI > 100000000) {
+    moneyString = '${(moneyI / 100000000).toStringAsFixed(2)}億';
+  } else if (moneyI > 10000000) {
+    moneyString = '${(moneyI / 10000000).toStringAsFixed(1)}千萬';
+  } else if (moneyI > 1000000) {
+    moneyString = '${(moneyI / 1000000).toStringAsFixed(1)}百萬';
+  } else if (moneyI > 100000) {
+    moneyString = '${(moneyI / 100000).toStringAsFixed(1)}十萬';
+  } else if (moneyI > 10000) {
+    moneyString = '${(moneyI / 10000).toStringAsFixed(1)}萬';
   }
-  return const Icon(Icons.notes, size: 30);
+
+  return money < 0 ? '-$moneyString' : moneyString;
 }

@@ -7,6 +7,13 @@ abstract class EditTaskEvent extends Equatable {
   List<Object> get props => [];
 }
 
+class EditTaskSpendingInit extends EditTaskEvent {
+  const EditTaskSpendingInit();
+
+  @override
+  List<Object> get props => [];
+}
+
 class EditTaskTitleChanged extends EditTaskEvent {
   const EditTaskTitleChanged(this.title);
 

@@ -11,6 +11,9 @@ class SpendingRepository {
 
   final SpendingApi _spendingApi;
 
+  /// Return [Spending] in given TaskId.
+  List<Spending> getSpendingsFromTaskID(String taskId) => _spendingApi.getSpendingsFromTaskID(taskId);
+
   /// Provides a [Stream] of all spending.
   Stream<List<Spending>> getSpendings() => _spendingApi.getSpendings();
 
@@ -25,4 +28,9 @@ class SpendingRepository {
   /// Deep delete spending
   /// Returns the number of deleted spending.
   Future<int> deepDeleteAll({required bool isDeleted}) => _spendingApi.deepDeleteAll(isDeleted: isDeleted);
+
+  /// Edit Spending.startDate by taskId
+  Future<void> editSpendingDateByTask(
+          {required String taskId, required DateTime startTime, required DateTime endTime,}) =>
+      _spendingApi.editSpendingDateByTask(taskId: taskId, startTime: startTime, endTime: endTime);
 }

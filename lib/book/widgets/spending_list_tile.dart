@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:intl/intl.dart';
 import 'package:spending_repository/spending_repository.dart';
 import 'package:tasks_api/tasks_api.dart';
-
-import '../bloc/book_bloc.dart';
+import 'package:spending_calendar/icon_select.dart';
 
 class SpendingListTile extends StatelessWidget {
   const SpendingListTile({
@@ -20,7 +19,7 @@ class SpendingListTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final state = context.watch<BookBloc>().state;
+    final moneyFormat = NumberFormat("#,###", "en_US");
     final isIncome = spending.money > 0 ? true : false;
     Color textColor = Colors.green;
     if (isIncome) {
@@ -32,7 +31,7 @@ class SpendingListTile extends StatelessWidget {
     return Dismissible(
       key: Key('spendingListTile_dismissible_${spending.id}'),
       onDismissed: onDismissed,
-      direction: DismissDirection.endToStart,
+      direction: onDismissed == null ? DismissDirection.none : DismissDirection.endToStart,
       background: Container(
         alignment: Alignment.centerRight,
         color: theme.colorScheme.error,
@@ -53,6 +52,8 @@ class SpendingListTile extends StatelessWidget {
             fontSize: 18,
           ),
         ),
+        dense: true,
+        visualDensity: const VisualDensity(vertical: 0),
         subtitle: Text(
           spending.title,
           maxLines: 1,
@@ -62,9 +63,9 @@ class SpendingListTile extends StatelessWidget {
           ),
           overflow: TextOverflow.ellipsis,
         ),
-        leading: subjectIcon(spending.subject ?? '其他', isIncome),
+        leading: spendingIcon(spending.subject ?? '其他', isIncome ? Colors.green : Colors.red, 30),
         trailing: Text(
-          spending.money.toString(),
+          moneyFormat.format(spending.money),
           style: TextStyle(
             color: textColor,
             fontSize: 18,
@@ -77,38 +78,6 @@ class SpendingListTile extends StatelessWidget {
   }
 }
 
-
 String getTaskTitleFromID(List<Task> tasks, String taskId) {
   return tasks.firstWhere((task) => task.id == taskId).title;
-}
-
-Widget subjectIcon(String subject, bool isIncome) {
-  const double iconSize = 30;
-  Color iconColor = Colors.green;
-  if (isIncome) {
-    iconColor = Colors.green;
-  } else {
-    iconColor = Colors.red;
-  }
-
-  if (subject == '其他') {
-    return Icon(Icons.work, size: iconSize, color: iconColor,);
-  } else if (subject == '早餐') {
-    return Icon(Icons.breakfast_dining, size: iconSize, color: iconColor,);
-  } else if (subject == '午餐') {
-    return Icon(Icons.dinner_dining, size: iconSize, color: iconColor,);
-  } else if (subject == '晚餐') {
-    return Icon(Icons.lunch_dining, size: iconSize, color: iconColor,);
-  } else if (subject == '飲品') {
-    return Icon(Icons.wine_bar, size: iconSize, color: iconColor,);
-  } else if (subject == '交通') {
-    return Icon(Icons.train, size: iconSize, color: iconColor,);
-  } else if (subject == '購物') {
-    return Icon(Icons.shopping_bag, size: iconSize, color: iconColor,);
-  } else if (subject == '房租') {
-    return Icon(Icons.house, size: iconSize, color: iconColor,);
-  } else if (subject == '社交') {
-    return Icon(Icons.people, size: iconSize, color: iconColor,);
-  }
-  return Icon(Icons.notes, size: iconSize, color: iconColor,);
 }

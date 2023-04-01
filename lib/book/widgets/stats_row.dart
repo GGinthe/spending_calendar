@@ -27,36 +27,64 @@ class MoneyStatsRow extends StatelessWidget {
     int calendarIncome = 0;
     int calendarExpense = 0;
     int calendarBalance = 0;
+    int weekExpense = 0;
+    int weekIncome = 0;
+    int monthExpense = 0;
+    int monthIncome = 0;
     String incomeText = '月收入';
     String expenseText = '月支出';
     String balanceText = '月平衡';
-    if (state.calendarFormat == CalendarFormat.month) {
-      final total = getMonthTotal(selectedDay ?? now);
-      calendarIncome = total.first;
-      calendarExpense = total.last * -1;
-      calendarBalance = total.first + total.last;
-      incomeText = '月收入';
-      expenseText = '月支出';
-      balanceText = '月平衡';
-    } else if (state.calendarFormat == CalendarFormat.week) {
-      final total = getWeekTotal(selectedDay ?? now);
-      calendarIncome = total.first;
-      calendarExpense = total.last * -1;
-      calendarBalance = total.first + total.last;
-      incomeText = '週收入';
-      expenseText = '週支出';
-      balanceText = '週平衡';
-    }
     final dayTotal = getDayTotal(selectedDay ?? now);
     final dayIncome = dayTotal.first;
     final dayExpense = dayTotal.last * -1;
     final dayBalance = dayTotal.first + dayTotal.last;
 
+    if (state.balanceStatus == BalanceStatus.income || state.balanceStatus == BalanceStatus.expanse) {
+      final monthTotal = getMonthTotal(selectedDay ?? now);
+      monthIncome = monthTotal.first;
+      monthExpense = monthTotal.last * -1;
+      final weekTotal = getWeekTotal(selectedDay ?? now);
+      weekIncome = weekTotal.first;
+      weekExpense = weekTotal.last * -1;
+    } else {
+      if (state.calendarFormat == CalendarFormat.month) {
+        final total = getMonthTotal(selectedDay ?? now);
+        calendarIncome = total.first;
+        calendarExpense = total.last * -1;
+        calendarBalance = total.first + total.last;
+        incomeText = '月收入';
+        expenseText = '月支出';
+        balanceText = '月平衡';
+      }
+      if (state.calendarFormat == CalendarFormat.week) {
+        final total = getWeekTotal(selectedDay ?? now);
+        calendarIncome = total.first;
+        calendarExpense = total.last * -1;
+        calendarBalance = total.first + total.last;
+        incomeText = '週收入';
+        expenseText = '週支出';
+        balanceText = '週平衡';
+      }
+    }
+
     return GestureDetector(
       onTap: () {
-        context.read<BookBloc>().add(
-              const CalendarBalanceChanged(),
-            );
+        if (state.balanceStatus == BalanceStatus.total) {
+          context.read<BookBloc>().add(const CalendarBalanceChanged(BalanceStatus.separate));
+        } else if (state.balanceStatus == BalanceStatus.separate) {
+          context.read<BookBloc>().add(const CalendarBalanceChanged(BalanceStatus.total));
+        } else if (state.balanceStatus == BalanceStatus.expanse) {
+          context.read<BookBloc>().add(const CalendarBalanceChanged(BalanceStatus.income));
+        } else if (state.balanceStatus == BalanceStatus.income) {
+          context.read<BookBloc>().add(const CalendarBalanceChanged(BalanceStatus.expanse));
+        }
+      },
+      onLongPress: () {
+        if (state.balanceStatus == BalanceStatus.total || state.balanceStatus == BalanceStatus.separate) {
+          context.read<BookBloc>().add(const CalendarBalanceChanged(BalanceStatus.expanse));
+        } else {
+          context.read<BookBloc>().add(const CalendarBalanceChanged(BalanceStatus.separate));
+        }
       },
       child: Container(
         height: 60,
@@ -68,13 +96,177 @@ class MoneyStatsRow extends StatelessWidget {
           children: [
             if (state.balanceStatus == BalanceStatus.total)
               ...totalRow(calendarBalance, dayBalance, balanceText)
-            else
+            else if (state.balanceStatus == BalanceStatus.separate)
               ...separateRow(calendarIncome, calendarExpense, dayIncome, dayExpense, incomeText, expenseText)
+            else if (state.balanceStatus == BalanceStatus.expanse)
+              ...expanseRow(monthExpense, weekExpense, dayExpense)
+            else if (state.balanceStatus == BalanceStatus.income)
+              ...incomeRow(monthIncome, weekIncome, dayExpense)
           ],
         ),
       ),
     );
   }
+}
+
+List<Expanded> incomeRow(int monthIncome, int weekIncome, int dayIncome) {
+  return [
+    Expanded(
+      child: Container(
+        color: const Color(0x652DFF50),
+        alignment: Alignment.center,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              alignment: Alignment.center,
+              child: const Text(
+                '月收入',
+                style: TextStyle(
+                  fontSize: 20.0,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ),
+            Container(
+              alignment: Alignment.center,
+              child: moneyFormatText(monthIncome),
+            ),
+          ],
+        ),
+      ),
+    ),
+    Expanded(
+      child: Container(
+        color: const Color(0x652DFF50),
+        alignment: Alignment.center,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              alignment: Alignment.center,
+              child: const Text(
+                '週收入',
+                style: TextStyle(
+                  fontSize: 20.0,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ),
+            Container(
+              alignment: Alignment.centerRight,
+              child: moneyFormatText(weekIncome),
+            ),
+          ],
+        ),
+      ),
+    ),
+    Expanded(
+      child: Container(
+        color: const Color(0x652DFF50),
+        alignment: Alignment.center,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              alignment: Alignment.center,
+              child: const Text(
+                '日收入',
+                style: TextStyle(
+                  fontSize: 20.0,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ),
+            Container(
+              alignment: Alignment.centerRight,
+              child: moneyFormatText(dayIncome),
+            ),
+          ],
+        ),
+      ),
+    ),
+  ];
+}
+
+List<Expanded> expanseRow(int monthExpense, int weekExpense, int dayExpense) {
+  return [
+    Expanded(
+      child: Container(
+        color: const Color(0x80FF2D2D),
+        alignment: Alignment.center,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              alignment: Alignment.center,
+              child: const Text(
+                '月支出',
+                style: TextStyle(
+                  fontSize: 20.0,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ),
+            Container(
+              alignment: Alignment.centerRight,
+              child: moneyFormatText(monthExpense),
+            ),
+          ],
+        ),
+      ),
+    ),
+    Expanded(
+      child: Container(
+        color: const Color(0x80FF2D2D),
+        alignment: Alignment.center,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              alignment: Alignment.center,
+              child: const Text(
+                '週支出',
+                style: TextStyle(
+                  fontSize: 20.0,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ),
+            Container(
+              alignment: Alignment.centerRight,
+              child: moneyFormatText(weekExpense),
+            ),
+          ],
+        ),
+      ),
+    ),
+    Expanded(
+      child: Container(
+        color: const Color(0x80FF2D2D),
+        alignment: Alignment.center,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              alignment: Alignment.center,
+              child: const Text(
+                '日支出',
+                style: TextStyle(
+                  fontSize: 20.0,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ),
+            Container(
+              alignment: Alignment.centerRight,
+              child: moneyFormatText(dayExpense),
+            ),
+          ],
+        ),
+      ),
+    ),
+  ];
 }
 
 List<Expanded> separateRow(int calendarIncome, int calendarExpense, int dayIncome, int dayExpense,

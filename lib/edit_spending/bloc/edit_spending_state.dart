@@ -21,6 +21,7 @@ class EditSpendingState extends Equatable {
     this.money = 0,
     this.isMoneyFieldCorrect = true,
     this.isTimeFieldCorrect = true,
+    this.isExpand = false,
     this.startDate,
     this.tasks = const [],
     this.subject,
@@ -34,6 +35,7 @@ class EditSpendingState extends Equatable {
   final int money;
   final bool isMoneyFieldCorrect;
   final bool isTimeFieldCorrect;
+  final bool isExpand;
   final DateTime? startDate;
   final List<Task> tasks;
   final String? subject;
@@ -53,6 +55,7 @@ class EditSpendingState extends Equatable {
     int? money,
     bool? isMoneyFieldCorrect,
     bool? isTimeFieldCorrect,
+    bool? isExpand,
     DateTime? startDate,
     List<Task>? tasks,
     String? subject,
@@ -66,6 +69,7 @@ class EditSpendingState extends Equatable {
       money: money ?? this.money,
       isMoneyFieldCorrect: isMoneyFieldCorrect ?? this.isMoneyFieldCorrect,
       isTimeFieldCorrect: isTimeFieldCorrect ?? this.isTimeFieldCorrect,
+      isExpand: isExpand ?? this.isExpand,
       startDate: startDate ?? this.startDate,
       tasks: tasks ?? this.tasks,
       subject: subject ?? this.subject,
@@ -84,6 +88,7 @@ class EditSpendingState extends Equatable {
         tasks,
         subject,
         isMoneyFieldCorrect,
-        isTimeFieldCorrect
+        isTimeFieldCorrect,
+        isExpand,
       ];
 }

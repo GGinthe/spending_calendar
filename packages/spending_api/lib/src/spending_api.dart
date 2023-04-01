@@ -13,6 +13,9 @@ abstract class SpendingApi {
   /// If a [spending] with the same id already exists, it will be replaced.
   Future<void> saveSpendings(Spending spending);
 
+  /// Return [Spending] in given TaskId.
+  List<Spending> getSpendingsFromTaskID(String taskId);
+
   /// Deletes the `spending` with the given id.
   /// set isDeleted to true, which can be restore
   /*Future<void> fakeDeleteSpending(String id);*/
@@ -24,6 +27,10 @@ abstract class SpendingApi {
   /// Deep delete spending
   /// Returns the number of deleted spendings.
   Future<int> deepDeleteAll({required bool isDeleted});
+
+  /// Edit Spending.startDate by taskId
+  Future<void> editSpendingDateByTask(
+      {required String taskId, required DateTime startTime, required DateTime endTime,});
 }
 
 /// Error thrown when a [Spending] with a given id is not found.

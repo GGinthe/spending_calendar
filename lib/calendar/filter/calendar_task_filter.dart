@@ -27,7 +27,19 @@ extension CalendarTasksFilterX on CalendarTasksFilter {
     return tasks.where(apply);
   }
 
+  bool isBetween(DateTime? startTime, DateTime? endTime, DateTime betweenTime) {
+    if(startTime == null || endTime == null){
+      return false;
+    }
+    if (startTime.isBefore(betweenTime) && endTime.isAfter(betweenTime)) {
+      return true;
+    } else if (isSameDay(startTime, betweenTime) || isSameDay(endTime, betweenTime)) {
+      return true;
+    }
+    return false;
+  }
+
   Iterable<Task> getDayTasks(Iterable<Task> tasks, DateTime dateTime) {
-    return tasks.where((task) => isSameDay(task.startDate, dateTime));
+    return tasks.where((task) => isBetween(task.startDate, task.endDate, dateTime));
   }
 }

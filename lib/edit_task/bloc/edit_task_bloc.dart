@@ -1,5 +1,6 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:spending_repository/spending_repository.dart';
 import 'package:tasks_repository/tasks_repository.dart';
 
 part 'edit_task_event.dart';
@@ -8,9 +9,11 @@ part 'edit_task_state.dart';
 
 class EditTaskBloc extends Bloc<EditTaskEvent, EditTaskState> {
   EditTaskBloc({
+    required SpendingRepository spendingsRepository,
     required TasksRepository tasksRepository,
     required Task? initialTask,
-  })  : _tasksRepository = tasksRepository,
+  })  : _spendingsRepository = spendingsRepository,
+        _tasksRepository = tasksRepository,
         super(
           EditTaskState(
             initialTask: initialTask,
@@ -21,6 +24,7 @@ class EditTaskBloc extends Bloc<EditTaskEvent, EditTaskState> {
             endDate: initialTask?.endDate,
           ),
         ) {
+    on<EditTaskSpendingInit>(_onInit);
     on<EditTaskTitleChanged>(_onTitleChanged);
     on<EditTaskDescriptionChanged>(_onDescriptionChanged);
     on<EditTaskStartDateChanged>(_onStartDateChanged);
@@ -29,7 +33,18 @@ class EditTaskBloc extends Bloc<EditTaskEvent, EditTaskState> {
     on<EditTaskSubjectChanged>(_onSubjectChanged);
   }
 
+  final SpendingRepository _spendingsRepository;
   final TasksRepository _tasksRepository;
+
+  void _onInit(
+    EditTaskSpendingInit event,
+    Emitter<EditTaskState> emit,
+  ) {
+    if (state.initialTask != null) {
+      final spendingList = _spendingsRepository.getSpendingsFromTaskID(state.initialTask!.id);
+      emit(state.copyWith(spendings: spendingList));
+    }
+  }
 
   void _onTitleChanged(
     EditTaskTitleChanged event,
@@ -120,7 +135,13 @@ class EditTaskBloc extends Bloc<EditTaskEvent, EditTaskState> {
       return;
     }
     try {
-      await _tasksRepository.saveTask(task);
+      await Future.wait([
+        _tasksRepository.saveTask(task),
+        if (state.initialTask != null) ...[
+          _spendingsRepository.editSpendingDateByTask(
+              taskId: state.initialTask!.id, startTime: task.startDate!, endTime: task.endDate!),
+        ]
+      ]);
       emit(state.copyWith(status: EditTaskStatus.success));
     } catch (e) {
       emit(state.copyWith(status: EditTaskStatus.failure));

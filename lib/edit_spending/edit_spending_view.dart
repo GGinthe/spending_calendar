@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:spending_calendar/edit_spending/edit_spending.dart';
+
 import 'package:spending_repository/spending_repository.dart';
 import 'package:tasks_repository/tasks_repository.dart';
 
@@ -19,7 +20,7 @@ class EditSpendingPage extends StatelessWidget {
           spendingsRepository: context.read<SpendingRepository>(),
           tasksRepository: context.read<TasksRepository>(),
           initialSpending: initialSpending,
-        ),
+        )..add(const EditSpendingTaskInit()),
         child: const EditSpendingPage(),
       ),
     );
@@ -90,18 +91,8 @@ class EditSpendingView extends StatelessWidget {
                   ],
                 ),
                 _MoneyValidate(),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    Expanded(
-                      child: _SubjectDropDownButton(),
-                    ),
-                    SizedBox(width: 10),
-                    Expanded(
-                      child: _StartDatePicker(),
-                    ),
-                  ],
-                ),
+                SubjectExpansion(),
+                _StartDatePicker(),
                 _TaskDropDownButton(),
               ],
             ),
@@ -278,9 +269,13 @@ class _TaskDropDownButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final state = context.watch<EditSpendingBloc>().state;
-    final pickerTask = state.selectedTaskId == '' ? null : state.selectedTaskId;
+    var pickerTask = state.selectedTaskId == '' ? null : state.selectedTaskId;
     final taskList = state.tasks;
+    final taskIdList = [for (var i in taskList) i.id];
 
+    if (!taskIdList.contains(pickerTask)) {
+      pickerTask = null;
+    }
     return DropdownButtonFormField2<String>(
       key: const Key('editSpendingView_task_dropdownButton'),
       decoration: InputDecoration(
@@ -321,54 +316,6 @@ class _TaskDropDownButton extends StatelessWidget {
       disabledHint: const Text('此日無行程', style: TextStyle(fontSize: 20)),
       onChanged: (value) {
         context.read<EditSpendingBloc>().add(EditSpendingTaskChanged(value ?? ''));
-      },
-    );
-  }
-}
-
-class _SubjectDropDownButton extends StatelessWidget {
-  const _SubjectDropDownButton();
-
-  @override
-  Widget build(BuildContext context) {
-    final state = context.watch<EditSpendingBloc>().state;
-    final hintText = state.initialSpending?.subject ?? '其他';
-    final itemList = ['其他', '早餐', '午餐', '晚餐', '飲品', '交通', '購物', '房租', '社交', '1', '2', '3'];
-
-    return DropdownButtonFormField2<String>(
-      key: const Key('editSpendingView_subject_dropdownButton'),
-      decoration: InputDecoration(
-        enabled: !state.status.isLoadingOrSuccess,
-        labelText: '類別',
-        labelStyle: const TextStyle(fontSize: 20),
-      ),
-      iconStyleData: const IconStyleData(
-        icon: Icon(
-          Icons.arrow_drop_down,
-          color: Colors.black45,
-        ),
-        iconSize: 30,
-      ),
-      buttonStyleData: const ButtonStyleData(
-        height: 30,
-      ),
-      dropdownStyleData: const DropdownStyleData(
-        maxHeight: 250,
-      ),
-      isExpanded: true,
-      items: itemList.map<DropdownMenuItem<String>>((String value) {
-        return DropdownMenuItem<String>(
-          value: value,
-          child: Text(
-            value,
-            style: const TextStyle(fontSize: 20),
-          ),
-        );
-      }).toList(),
-      value: hintText,
-      hint: const Text('類別', style: TextStyle(fontSize: 20)),
-      onChanged: (value) {
-        context.read<EditSpendingBloc>().add(EditSpendingSubjectChanged(value ?? ''));
       },
     );
   }

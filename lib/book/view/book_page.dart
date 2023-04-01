@@ -96,6 +96,7 @@ class _TableCalendar extends StatelessWidget {
   Widget build(BuildContext context) {
     final state = context.watch<BookBloc>().state;
     final DateTime selectedDayState = state.selectedDay ?? DateTime.now();
+    final balanceStatus = state.balanceStatus;
     DateTime focusedDayState = state.focusedDay ?? DateTime.now();
     CalendarFormat calendarFormatState = state.calendarFormat;
 
@@ -120,6 +121,11 @@ class _TableCalendar extends StatelessWidget {
       calendarBuilders: CalendarBuilders(
         markerBuilder: (context, day, events) {
           events as List<Spending>;
+          if (balanceStatus == BalanceStatus.income) {
+            events = events.where((spending) => spending.money > 0).toList();
+          } else if (balanceStatus == BalanceStatus.expanse) {
+            events = events.where((spending) => spending.money < 0).toList();
+          }
           final markerMoney = [for (var spending in events) spending.money].fold<int>(0, (a, b) => a + b);
           if (day.month == selectedDayState.month || calendarFormatState == CalendarFormat.week) {
             return Container(
@@ -194,16 +200,23 @@ class _SpendingListView extends StatelessWidget {
   Widget build(BuildContext context) {
     final state = context.watch<BookBloc>().state;
     final DateTime selectedDayState = state.selectedDay ?? DateTime.now();
-    List<Spending> getTasksForDay(DateTime day) {
+    final balanceStatus = state.balanceStatus;
+    List<Spending> getSpendingsForDay(DateTime day) {
       return state.getDaySpendings(day).toList();
     }
 
-    List<Spending> selectedDayTask = getTasksForDay(selectedDayState);
+    List<Spending> selectedDaySpending = getSpendingsForDay(selectedDayState);
+    if (balanceStatus == BalanceStatus.income) {
+      selectedDaySpending = selectedDaySpending.where((spending) => spending.money > 0).toList();
+    } else if (balanceStatus == BalanceStatus.expanse) {
+      selectedDaySpending = selectedDaySpending.where((spending) => spending.money < 0).toList();
+    }
+
     return CupertinoScrollbar(
       child: ListView(
         shrinkWrap: true,
-        children: [
-          for (final spending in selectedDayTask)
+        children: ListTile.divideTiles(context: context, tiles: [
+          for (final spending in selectedDaySpending)
             SpendingListTile(
               spending: spending,
               onDismissed: (_) {
@@ -215,7 +228,7 @@ class _SpendingListView extends StatelessWidget {
                 );
               },
             ),
-        ],
+        ]).toList(),
       ),
     );
   }
