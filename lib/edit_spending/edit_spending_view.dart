@@ -282,12 +282,10 @@ class _TaskDropDownButton extends StatelessWidget {
         enabled: !state.status.isLoadingOrSuccess,
         labelText: '行程花費',
         labelStyle: const TextStyle(fontSize: 20),
-        //contentPadding: const EdgeInsets.only(top: 15, bottom:15),
       ),
       iconStyleData: const IconStyleData(
         icon: Icon(
           Icons.arrow_drop_down,
-          color: Colors.black45,
         ),
         iconSize: 30,
       ),

@@ -55,7 +55,10 @@ Widget spendingIcon(String subject,Color iconColor, double iconSize) {
     return Icon(Icons.fastfood, size: iconSize, color: iconColor,);
   }else if (subject == '發票') {
     return Icon(Icons.receipt, size: iconSize, color: iconColor,);
+  }else if (subject == '提醒') {
+    return Icon(Icons.notifications, size: iconSize, color: iconColor,);
   }
+
   return Icon(Icons.notes, size: iconSize, color: iconColor,);
 }
 

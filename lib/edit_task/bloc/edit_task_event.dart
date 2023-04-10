@@ -59,6 +59,40 @@ class EditTaskEndDateChanged extends EditTaskEvent {
   List<Object> get props => [endDate];
 }
 
+class EditTaskIsExpandChanged extends EditTaskEvent {
+  const EditTaskIsExpandChanged();
+
+  @override
+  List<Object> get props => [];
+}
+
+class EditTaskIsCheckChanged extends EditTaskEvent {
+  const EditTaskIsCheckChanged(this.type);
+  /// 0: hour, 1: day, 2: week, 3: Expand, 4: Begin
+  final int type;
+
+  @override
+  List<Object> get props => [type];
+}
+
+class EditTaskNotificationTextChanged extends EditTaskEvent {
+  const EditTaskNotificationTextChanged(this.notificationText);
+
+  final int notificationText;
+
+  @override
+  List<Object> get props => [notificationText];
+}
+
+class EditTaskNotificationTypeChanged extends EditTaskEvent {
+  const EditTaskNotificationTypeChanged(this.notificationType);
+
+  final String notificationType;
+
+  @override
+  List<Object> get props => [notificationType];
+}
+
 class EditTaskSubmitted extends EditTaskEvent {
   const EditTaskSubmitted();
 }

@@ -1,3 +1,4 @@
+import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -72,21 +73,25 @@ class EditTaskView extends StatelessWidget {
         child:
             status.isLoadingOrSuccess ? const CupertinoActivityIndicator() : const Icon(Icons.check_rounded),
       ),
-      body: const Padding(
-        padding: EdgeInsets.all(16),
-        child: Column(
-          children: [
-            _TitleField(),
-            _DescriptionField(),
-            _SubjectButton(),
-            _StartDatePicker(),
-            _EndDatePicker(),
-            SizedBox(height: 15),
-            Expanded(
-              child: _SpendingListView(),
+      body: const CupertinoScrollbar(
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: EdgeInsets.all(16),
+            child: Column(
+              children: [
+                _TitleField(),
+                _DescriptionField(),
+                _SubjectButton(),
+                _StartDatePicker(),
+                _EndDatePicker(),
+                SizedBox(height: 5),
+                _NotificationPicker(),
+                SizedBox(height: 5),
+                _SpendingListView(),
+                SizedBox(height: 40)
+              ],
             ),
-            SizedBox(height: 40)
-          ],
+          ),
         ),
       ),
     );
@@ -226,7 +231,7 @@ class _StartDatePicker extends StatelessWidget {
             labelText: '開始日期',
           ),
           readOnly: true,
-          style: const TextStyle(fontSize: 20),
+          style: const TextStyle(fontSize: 17),
           onTap: () async {
             DateTime? pickerDate = await showOmniDateTimePicker(
               context: context,
@@ -269,7 +274,7 @@ class _EndDatePicker extends StatelessWidget {
             labelText: '結束日期',
           ),
           readOnly: true,
-          style: const TextStyle(fontSize: 20),
+          style: const TextStyle(fontSize: 17),
           onTap: () async {
             DateTime? pickerDate = await showOmniDateTimePicker(
               context: context,
@@ -292,6 +297,182 @@ class _EndDatePicker extends StatelessWidget {
   }
 }
 
+class _NotificationPicker extends StatelessWidget {
+  const _NotificationPicker();
+
+  @override
+  Widget build(BuildContext context) {
+    final state = context.watch<EditTaskBloc>().state;
+    final isHourCheck = state.isHourCheck;
+    final isDayCheck = state.isDayCheck;
+    final isWeekCheck = state.isWeekCheck;
+    final isBeginCheck = state.isBeginCheck;
+    final isCheckExpand = state.isCheckExpand;
+    final pickerType = state.notificationType;
+    final pickerText = state.notificationText.toString();
+    String notificationText = '';
+    if (isBeginCheck) {
+      notificationText += '開始時';
+    }
+    if (isHourCheck) {
+      if (isBeginCheck) {
+        notificationText += ', ';
+      }
+      notificationText += '1 小時前';
+    }
+    if (isDayCheck) {
+      if (isHourCheck || isBeginCheck) {
+        notificationText += ', ';
+      }
+      notificationText += '1 天前';
+    }
+    if (isWeekCheck) {
+      if (isHourCheck || isDayCheck || isBeginCheck) {
+        notificationText += ', ';
+      }
+      notificationText += '1 週前';
+    }
+
+    if (pickerText != '0' && pickerText != '') {
+      if (isHourCheck || isDayCheck || isWeekCheck || isBeginCheck) {
+        notificationText += ', ';
+      }
+      notificationText += '$pickerText  $pickerType';
+    }
+    if(notificationText.length > 26 ){
+      notificationText = '${notificationText.substring(0, 25)}...';
+    }
+
+    return ExpansionPanelList(
+        elevation: 1,
+        expandedHeaderPadding: const EdgeInsets.all(2),
+        children: [
+          ExpansionPanel(
+            canTapOnHeader: false,
+            headerBuilder: (context, isExpanded) {
+              if (!isExpanded) {
+                return Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    if (notificationText.length < 20) const Icon(Icons.notifications, size: 30),
+                    if (notificationText.length < 15)
+                      const Text('提醒',
+                          maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 18)),
+                    Text(notificationText, maxLines: 1, overflow: TextOverflow.ellipsis),
+                  ],
+                );
+              } else {
+                return Container(
+                    padding: const EdgeInsets.only(top: 5, left: 15),
+                    child: const Text(
+                      '提醒設定',
+                      textAlign: TextAlign.start,
+                      style: TextStyle(
+                        fontSize: 18,
+                      ),
+                    ));
+              }
+            },
+            body: ListView(
+              shrinkWrap: true,
+              children: ListTile.divideTiles(context: context, tiles: [
+                CheckboxListTile(
+                  title: const Text('活動開始時'),
+                  value: isBeginCheck,
+                  onChanged: (bool? value) {
+                    context.read<EditTaskBloc>().add(const EditTaskIsCheckChanged(4));
+                  },
+                  secondary: const Icon(Icons.notifications),
+                ),
+                CheckboxListTile(
+                  title: const Text('一小時前'),
+                  value: isHourCheck,
+                  onChanged: (bool? value) {
+                    context.read<EditTaskBloc>().add(const EditTaskIsCheckChanged(0));
+                  },
+                  secondary: const Icon(Icons.notifications),
+                ),
+                CheckboxListTile(
+                  title: const Text('一天前'),
+                  value: isDayCheck,
+                  onChanged: (bool? value) {
+                    context.read<EditTaskBloc>().add(const EditTaskIsCheckChanged(1));
+                  },
+                  secondary: const Icon(Icons.notifications),
+                ),
+                CheckboxListTile(
+                  title: const Text('一週前'),
+                  value: isWeekCheck,
+                  onChanged: (bool? value) {
+                    context.read<EditTaskBloc>().add(const EditTaskIsCheckChanged(2));
+                  },
+                  secondary: const Icon(Icons.notifications),
+                ),
+                ListTile(
+                  dense: true,
+                  visualDensity: const VisualDensity(vertical: 0),
+                  title: SizedBox(
+                    width: 80,
+                    child: TextFormField(
+                      key: const Key('editTextView_notification_textFormField'),
+                      initialValue: pickerText,
+                      decoration: InputDecoration(
+                        enabled: !state.status.isLoadingOrSuccess,
+                        counterText: "",
+                      ),
+                      textAlign: TextAlign.center,
+                      maxLength: 2,
+                      keyboardType: TextInputType.number,
+                      inputFormatters: [
+                        LengthLimitingTextInputFormatter(2),
+                        FilteringTextInputFormatter.digitsOnly,
+                        FilteringTextInputFormatter.deny(RegExp('^0+'))
+                      ],
+                      onChanged: (value) {
+                        context
+                            .read<EditTaskBloc>()
+                            .add(EditTaskNotificationTextChanged(int.tryParse(value) ?? 0));
+                      },
+                    ),
+                  ),
+                  trailing: SizedBox(
+                    width: 200,
+                    child: DropdownButtonFormField2<String>(
+                      key: const Key('editSpendingView_task_dropdownButton'),
+                      decoration: InputDecoration(
+                        enabled: !state.status.isLoadingOrSuccess,
+                      ),
+                      iconStyleData: const IconStyleData(
+                        icon: Icon(
+                          Icons.arrow_drop_down,
+                        ),
+                      ),
+                      items: ['分前', '小時前', '天前', '週前', '月前'].map((x) {
+                        return DropdownMenuItem(
+                            value: x,
+                            child: Text(
+                              x,
+                              style: const TextStyle(fontSize: 14),
+                            ));
+                      }).toList(),
+                      value: pickerType,
+                      onChanged: (value) {
+                        context.read<EditTaskBloc>().add(EditTaskNotificationTypeChanged(value ?? '分前'));
+                      },
+                    ),
+                  ),
+                )
+              ]).toList(),
+            ),
+            isExpanded: isCheckExpand,
+          ),
+        ],
+        expansionCallback: (panelIndex, isExpanded) {
+          context.read<EditTaskBloc>().add(const EditTaskIsCheckChanged(3));
+        });
+  }
+}
+
 class _SpendingListView extends StatelessWidget {
   const _SpendingListView();
 
@@ -300,16 +481,75 @@ class _SpendingListView extends StatelessWidget {
     final state = context.watch<EditTaskBloc>().state;
     final spendings = state.spendings;
 
-    return CupertinoScrollbar(
-      child: ListView(
-        shrinkWrap: true,
-        children: ListTile.divideTiles(context: context, tiles: [
-          for (final spending in spendings)
-            SpendingListTile(
-              spending: spending,
+    if (spendings.isEmpty) {
+      return const SizedBox();
+    }
+
+    final isExpand = state.isExpand;
+    final totalMoney = [for (var spending in spendings) spending.money].fold<int>(0, (a, b) => a + b);
+    final isIncome = totalMoney > 0 ? true : false;
+    Color textColor = Colors.green;
+    if (isIncome) {
+      textColor = Colors.green;
+    } else {
+      textColor = Colors.red;
+    }
+    return ExpansionPanelList(
+        elevation: 1,
+        expandedHeaderPadding: const EdgeInsets.all(2),
+        children: [
+          ExpansionPanel(
+            canTapOnHeader: false,
+            headerBuilder: (context, isExpanded) {
+              if (!isExpanded) {
+                return ListTile(
+                  title: const Text(
+                    '收支',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      fontSize: 18,
+                    ),
+                  ),
+                  dense: true,
+                  visualDensity: const VisualDensity(vertical: 0),
+                  leading: spendingIcon('其他', textColor, 30),
+                  trailing: Text(
+                    NumberFormat("#,###", "en_US").format(totalMoney),
+                    style: TextStyle(
+                      color: textColor,
+                      fontSize: 18,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                );
+              } else {
+                return Container(
+                    padding: const EdgeInsets.only(top: 5, left: 15),
+                    child: const Text(
+                      '收支明細',
+                      textAlign: TextAlign.start,
+                      style: TextStyle(
+                        fontSize: 18,
+                      ),
+                    ));
+              }
+            },
+            body: ListView(
+              shrinkWrap: true,
+              children: ListTile.divideTiles(context: context, tiles: [
+                for (final spending in spendings)
+                  SpendingListTile(
+                    spending: spending,
+                  ),
+              ]).toList(),
             ),
-        ]).toList(),
-      ),
-    );
+            isExpanded: isExpand,
+          ),
+        ],
+        expansionCallback: (panelIndex, isExpanded) {
+          context.read<EditTaskBloc>().add(const EditTaskIsExpandChanged());
+        });
   }
 }

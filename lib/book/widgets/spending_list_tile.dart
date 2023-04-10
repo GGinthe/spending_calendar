@@ -48,7 +48,6 @@ class SpendingListTile extends StatelessWidget {
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
           style: const TextStyle(
-            color: Colors.black,
             fontSize: 18,
           ),
         ),
@@ -58,12 +57,11 @@ class SpendingListTile extends StatelessWidget {
           spending.title,
           maxLines: 1,
           style: const TextStyle(
-            color: Colors.black,
             fontSize: 14,
           ),
           overflow: TextOverflow.ellipsis,
         ),
-        leading: spendingIcon(spending.subject ?? '其他', isIncome ? Colors.green : Colors.red, 30),
+        leading: spendingIcon(spending.subject ?? '其他', textColor, 30),
         trailing: Text(
           moneyFormat.format(spending.money),
           style: TextStyle(

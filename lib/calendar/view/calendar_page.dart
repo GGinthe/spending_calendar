@@ -119,7 +119,7 @@ class _TableCalendar extends StatelessWidget {
         final markerText = events.length < 10 ? events.length.toString() : '9+';
         if (day.month == selectedDayState.month || calendarFormatState == CalendarFormat.week) {
           return Container(
-            width: 40,
+            width: 30,
             height: 15,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(30.0),
@@ -130,7 +130,7 @@ class _TableCalendar extends StatelessWidget {
               textAlign: TextAlign.center,
               style: const TextStyle(
                 color: Colors.black,
-                fontSize: 14.0,
+                fontSize: 10.0,
               ),
             ),
           );

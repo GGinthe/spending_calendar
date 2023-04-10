@@ -11,7 +11,7 @@ class SubjectExpansion extends StatelessWidget {
     final state = context.watch<EditSpendingBloc>().state;
     final isExpand = state.isExpand;
     final selectedSubject = state.subject ?? '其他';
-    const headerIconSize = 45.0;
+    const headerIconSize = 40.0;
     const bodyIconSize = 35.0;
     Widget icon(String text, double iconSize) {
       return Padding(
@@ -42,8 +42,23 @@ class SubjectExpansion extends StatelessWidget {
     final List<String> headerExpanse = ['餐飲', '交通', '購物', '其他'];
     final List<String> headerIncome = ['薪水', '股票', '回饋', '其他'];
     final List<List<String>> bodyExpanse = [
-      ['早餐', '午餐', '晚餐', '飲品', '點心', '禮物', '數位'],
-      ['日用', '娛樂', '房租', '醫療', '社交', '學習', '保險'],
+      [
+        '早餐',
+        '午餐',
+        '晚餐',
+        '飲品',
+        '點心',
+        '禮物',
+      ],
+      [
+        '數位',
+        '日用',
+        '娛樂',
+        '房租',
+        '醫療',
+        '社交',
+      ],
+      ['學習', '保險']
     ];
     final List<List<String>> bodyIncome = [
       ['獎金', '租金', '投資', '兼職', '買賣', '發票']

@@ -129,7 +129,7 @@ class _TableCalendar extends StatelessWidget {
           final markerMoney = [for (var spending in events) spending.money].fold<int>(0, (a, b) => a + b);
           if (day.month == selectedDayState.month || calendarFormatState == CalendarFormat.week) {
             return Container(
-              width: 55,
+              width: 50,
               height: 15,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(30.0),
@@ -140,7 +140,7 @@ class _TableCalendar extends StatelessWidget {
                 textAlign: TextAlign.center,
                 style: const TextStyle(
                   color: Colors.black,
-                  fontSize: 13.0,
+                  fontSize: 9.5,
                 ),
               ),
             );

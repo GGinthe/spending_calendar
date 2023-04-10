@@ -1,3 +1,5 @@
+// ignore_for_file: lines_longer_than_80_chars
+
 import 'package:tasks_api/tasks_api.dart';
 
 /// {@template tasks_repository}
@@ -30,8 +32,7 @@ class TasksRepository {
 
   /// Deep delete task
   /// Returns the number of deleted tasks.
-  Future<int> deepDeleteAll({required bool isDeleted}) =>
-      _tasksApi.deepDeleteAll(isDeleted: isDeleted);
+  Future<int> deepDeleteAll({required bool isDeleted}) => _tasksApi.deepDeleteAll(isDeleted: isDeleted);
 
   /// Deletes all completed tasks.
   /// Returns the number of deleted tasks.
@@ -39,6 +40,9 @@ class TasksRepository {
 
   /// Sets the `isCompleted` state of all tasks to the given value.
   /// Returns the number of updated tasks.
-  Future<int> completeAll({required bool isCompleted}) =>
-      _tasksApi.completeAll(isCompleted: isCompleted);
+  Future<int> completeAll({required bool isCompleted}) => _tasksApi.completeAll(isCompleted: isCompleted);
+
+  ///
+  Future<void> addNotifications(Task task, List<Duration> notificationsTime, List<int> notificationsId) =>
+      _tasksApi.addNotifications(task, notificationsTime, notificationsId);
 }

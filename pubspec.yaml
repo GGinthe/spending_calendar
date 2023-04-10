@@ -36,6 +36,10 @@ dependencies:
   omni_datetime_picker: ^1.0.1
   syncfusion_flutter_calendar: ^20.4.53
   dropdown_button2: ^2.0.0
+  flutter_local_notifications: ^14.0.0-dev.2
+  flutter_launcher_icons: ^0.12.0
+  timezone: ^0.9.1
+  flutter_timezone: ^1.0.4
 
 
 dev_dependencies:
@@ -51,7 +55,10 @@ dev_dependencies:
 flutter:
   uses-material-design: true
   generate: true
-  # To add assets to your application, add an assets section, like this:
-  # assets:
-  #   - images/a_dot_burr.jpeg
-  #   - images/a_dot_ham.jpeg
+  assets:
+    - assets/logo/calendar_icon.png
+
+flutter_icons:
+  image_path: "assets/logo/calendar_icon.png"
+  android: true # can specify file name here e.g. "ic_launcher"
+  ios: true # can specify file name here e.g. "My-Launcher-Icon"

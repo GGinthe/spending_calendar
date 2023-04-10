@@ -21,7 +21,7 @@ void bootstrap({required TasksApi tasksApi, required SpendingApi spendingApi}) {
   final spendingsRepository = SpendingRepository(spendingApi: spendingApi);
 
   runZonedGuarded(
-    () => runApp(App(tasksRepository: tasksRepository, spendingsRespository: spendingsRepository)),
+    () => runApp(App(tasksRepository: tasksRepository, spendingsRepository: spendingsRepository)),
     (error, stackTrace) => log(error.toString(), stackTrace: stackTrace),
   );
 }

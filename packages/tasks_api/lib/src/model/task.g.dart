@@ -25,6 +25,14 @@ Task _$TaskFromJson(Map<String, dynamic> json) => Task(
       color: _$JsonConverterFromJson<int, Color>(
           json['color'], const ColorSerialiser().fromJson,),
       isAllDay: json['isAllDay'] as bool? ?? false,
+      notificationsDuration: (json['notificationsDuration'] as List<dynamic>?)
+              ?.map((e) => Duration(microseconds: e as int))
+              .toList() ??
+          const [],
+      notificationsId: (json['notificationsId'] as List<dynamic>?)
+              ?.map((e) => e as int)
+              .toList() ??
+          const [],
     );
 
 Map<String, dynamic> _$TaskToJson(Task instance) => <String, dynamic>{
@@ -40,6 +48,9 @@ Map<String, dynamic> _$TaskToJson(Task instance) => <String, dynamic>{
       'color': _$JsonConverterToJson<int, Color>(
           instance.color, const ColorSerialiser().toJson,),
       'isAllDay': instance.isAllDay,
+      'notificationsDuration':
+          instance.notificationsDuration.map((e) => e.inMicroseconds).toList(),
+      'notificationsId': instance.notificationsId,
     };
 
 Value? _$JsonConverterFromJson<Json, Value>(

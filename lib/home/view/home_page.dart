@@ -6,7 +6,6 @@ import 'package:spending_calendar/home/home.dart';
 import 'package:spending_calendar/book/book.dart';
 import 'package:spending_calendar/calendar/calendar.dart';
 
-
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
 

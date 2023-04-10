@@ -6,21 +6,17 @@ import 'package:tasks_repository/tasks_repository.dart';
 import 'package:spending_repository/spending_repository.dart';
 
 class App extends StatelessWidget {
-  const App({super.key, required this.tasksRepository, required this.spendingsRespository});
+  const App({super.key, required this.tasksRepository, required this.spendingsRepository});
 
   final TasksRepository tasksRepository;
-  final SpendingRepository spendingsRespository;
+  final SpendingRepository spendingsRepository;
 
   @override
   Widget build(BuildContext context) {
-    /*return RepositoryProvider.value(
-      value: tasksRepository,
-      child: const AppView(),
-    );*/
     return MultiRepositoryProvider(
-      providers:[
+      providers: [
         RepositoryProvider.value(value: tasksRepository),
-        RepositoryProvider.value(value: spendingsRespository),
+        RepositoryProvider.value(value: spendingsRepository),
       ],
       child: const AppView(),
     );
@@ -33,13 +29,10 @@ class AppView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       theme: FlutterTasksTheme.light,
       darkTheme: FlutterTasksTheme.dark,
-      //localizationsDelegates: AppLocalizations.localizationsDelegates,
-      //supportedLocales: AppLocalizations.supportedLocales,
       home: const HomePage(),
     );
   }
 }
-
-

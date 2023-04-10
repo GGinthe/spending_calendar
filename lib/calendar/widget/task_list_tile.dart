@@ -24,7 +24,7 @@ class TaskListTile extends StatelessWidget {
     final state = context.watch<CalendarBloc>().state;
     final taskSpending = state.getSpendingsFromTaskID(task.id);
     final taskMoney = [for (var spending in taskSpending) spending.money].fold<int>(0, (a, b) => a + b);
-    final moneyColor = taskMoney > 0 ? Colors.green : taskMoney == 0 ? Colors.black : Colors.red;
+    final moneyColor = taskMoney > 0 ? Colors.green : taskMoney == 0 ? null : Colors.red;
 
     return Dismissible(
       key: Key('taskListTile_dismissible_${task.id}'),
@@ -46,7 +46,6 @@ class TaskListTile extends StatelessWidget {
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
           style: const TextStyle(
-            color: Colors.black,
             fontSize: 18,
           ),
         ),
@@ -57,7 +56,6 @@ class TaskListTile extends StatelessWidget {
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
           style: const TextStyle(
-            color: Colors.black,
             fontSize: 14,
           ),
         ),
@@ -75,8 +73,8 @@ class TaskListTile extends StatelessWidget {
 }
 
 String dateFormat(DateTime startDate, DateTime endDate) {
-  final startText = DateFormat('MM/dd – kk:mm ').format(startDate);
-  final endText = DateFormat('MM/dd – kk:mm ').format(endDate);
+  final startText = DateFormat('MM/dd – kk:mm').format(startDate);
+  final endText = DateFormat('MM/dd – kk:mm').format(endDate);
   return '$startText ~ $endText';
 }
 

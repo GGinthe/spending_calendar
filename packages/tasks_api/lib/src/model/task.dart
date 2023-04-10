@@ -1,3 +1,5 @@
+// ignore_for_file: lines_longer_than_80_chars
+
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -24,7 +26,7 @@ class ColorSerialiser implements JsonConverter<Color, int> {
 ///
 /// [Task]s are immutable and can be copied using [copyWith], in addition to
 /// being serialized / deserialized using [toJson] and [fromJson] respectively.
-/// {@endtemplate}
+/// {@template}
 @immutable
 @JsonSerializable()
 class Task extends Equatable {
@@ -41,6 +43,8 @@ class Task extends Equatable {
     this.subject,
     this.color,
     this.isAllDay = false,
+    this.notificationsDuration = const [],
+    this.notificationsId = const [],
   })  : assert(
           id == null || id.isNotEmpty,
           'id can not be null and should be empty',
@@ -81,6 +85,12 @@ class Task extends Equatable {
   /// whether the task is all day
   final bool isAllDay;
 
+  ///
+  final List<Duration> notificationsDuration;
+
+  ///
+  final List<int> notificationsId;
+
   /// Returns a copy of this `task` with the given values updated.
   ///
   /// {@macro task_item}
@@ -96,6 +106,8 @@ class Task extends Equatable {
     String? subject,
     Color? color,
     bool? isAllDay,
+    List<Duration>? notificationsDuration,
+    List<int>? notificationsId,
   }) {
     return Task(
       id: id ?? this.id,
@@ -109,6 +121,8 @@ class Task extends Equatable {
       subject: subject ?? this.subject,
       color: color ?? this.color,
       isAllDay: isAllDay ?? this.isAllDay,
+      notificationsDuration: notificationsDuration ?? this.notificationsDuration,
+      notificationsId: notificationsId ?? this.notificationsId,
     );
   }
 
@@ -134,5 +148,7 @@ class Task extends Equatable {
         subject ?? false,
         color ?? false,
         isAllDay,
+        notificationsDuration,
+        notificationsId,
       ];
 }

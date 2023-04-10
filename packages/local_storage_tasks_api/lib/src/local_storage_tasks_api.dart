@@ -1,3 +1,5 @@
+// ignore_for_file: lines_longer_than_80_chars
+
 import 'dart:async';
 import 'dart:convert';
 
@@ -132,5 +134,19 @@ class LocalStorageTasksApi extends TasksApi {
       return null;
     }
     return tasks.firstWhere((task) => task.id == taskId);
+  }
+
+  @override
+  Future<void> addNotifications(Task task, List<Duration> notificationsTime, List<int> notificationsId) {
+    final tasks = [..._taskStreamController.value];
+    final taskIndex = tasks.indexWhere((t) => t.id == task.id);
+    final newTasks = task.copyWith(notificationsDuration: notificationsTime, notificationsId: notificationsId);
+    if (taskIndex >= 0) {
+      tasks[taskIndex] = newTasks;
+    } else {
+      tasks.add(newTasks);
+    }
+    _taskStreamController.add(tasks);
+    return _setValue(kTasksCollectionKey, json.encode(tasks));
   }
 }

@@ -1,3 +1,5 @@
+// ignore_for_file: lines_longer_than_80_chars
+
 import 'package:tasks_api/tasks_api.dart';
 
 /// {@template tasks_api}
@@ -38,6 +40,9 @@ abstract class TasksApi {
   /// Sets the `isCompleted` state of all tasks to the given value.
   /// Returns the number of updated tasks.
   Future<int> completeAll({required bool isCompleted});
+
+  ///
+  Future<void> addNotifications(Task task, List<Duration> notificationsTime, List<int> notificationsId);
 }
 
 /// Error thrown when a [Task] with a given id is not found.

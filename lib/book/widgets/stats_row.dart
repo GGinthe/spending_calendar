@@ -33,7 +33,7 @@ class MoneyStatsRow extends StatelessWidget {
     int monthIncome = 0;
     String incomeText = '月收入';
     String expenseText = '月支出';
-    String balanceText = '月平衡';
+    String balanceText = '月收支';
     final dayTotal = getDayTotal(selectedDay ?? now);
     final dayIncome = dayTotal.first;
     final dayExpense = dayTotal.last * -1;
@@ -54,7 +54,7 @@ class MoneyStatsRow extends StatelessWidget {
         calendarBalance = total.first + total.last;
         incomeText = '月收入';
         expenseText = '月支出';
-        balanceText = '月平衡';
+        balanceText = '月收支';
       }
       if (state.calendarFormat == CalendarFormat.week) {
         final total = getWeekTotal(selectedDay ?? now);
@@ -63,7 +63,7 @@ class MoneyStatsRow extends StatelessWidget {
         calendarBalance = total.first + total.last;
         incomeText = '週收入';
         expenseText = '週支出';
-        balanceText = '週平衡';
+        balanceText = '週收支';
       }
     }
 
@@ -110,6 +110,7 @@ class MoneyStatsRow extends StatelessWidget {
 }
 
 List<Expanded> incomeRow(int monthIncome, int weekIncome, int dayIncome) {
+  const fontSize = 11.0;
   return [
     Expanded(
       child: Container(
@@ -123,7 +124,7 @@ List<Expanded> incomeRow(int monthIncome, int weekIncome, int dayIncome) {
               child: const Text(
                 '月收入',
                 style: TextStyle(
-                  fontSize: 20.0,
+                  fontSize: fontSize,
                   fontWeight: FontWeight.w500,
                 ),
               ),
@@ -148,7 +149,7 @@ List<Expanded> incomeRow(int monthIncome, int weekIncome, int dayIncome) {
               child: const Text(
                 '週收入',
                 style: TextStyle(
-                  fontSize: 20.0,
+                  fontSize: fontSize,
                   fontWeight: FontWeight.w500,
                 ),
               ),
@@ -173,7 +174,7 @@ List<Expanded> incomeRow(int monthIncome, int weekIncome, int dayIncome) {
               child: const Text(
                 '日收入',
                 style: TextStyle(
-                  fontSize: 20.0,
+                  fontSize: fontSize,
                   fontWeight: FontWeight.w500,
                 ),
               ),
@@ -190,6 +191,7 @@ List<Expanded> incomeRow(int monthIncome, int weekIncome, int dayIncome) {
 }
 
 List<Expanded> expanseRow(int monthExpense, int weekExpense, int dayExpense) {
+  const fontSize = 11.0;
   return [
     Expanded(
       child: Container(
@@ -203,7 +205,7 @@ List<Expanded> expanseRow(int monthExpense, int weekExpense, int dayExpense) {
               child: const Text(
                 '月支出',
                 style: TextStyle(
-                  fontSize: 20.0,
+                  fontSize: fontSize,
                   fontWeight: FontWeight.w500,
                 ),
               ),
@@ -228,7 +230,7 @@ List<Expanded> expanseRow(int monthExpense, int weekExpense, int dayExpense) {
               child: const Text(
                 '週支出',
                 style: TextStyle(
-                  fontSize: 20.0,
+                  fontSize: fontSize,
                   fontWeight: FontWeight.w500,
                 ),
               ),
@@ -253,7 +255,7 @@ List<Expanded> expanseRow(int monthExpense, int weekExpense, int dayExpense) {
               child: const Text(
                 '日支出',
                 style: TextStyle(
-                  fontSize: 20.0,
+                  fontSize: fontSize,
                   fontWeight: FontWeight.w500,
                 ),
               ),
@@ -271,6 +273,7 @@ List<Expanded> expanseRow(int monthExpense, int weekExpense, int dayExpense) {
 
 List<Expanded> separateRow(int calendarIncome, int calendarExpense, int dayIncome, int dayExpense,
     String incomeText, String expenseText) {
+  const fontSize = 11.0;
   return [
     Expanded(
       child: Container(
@@ -284,7 +287,7 @@ List<Expanded> separateRow(int calendarIncome, int calendarExpense, int dayIncom
               child: Text(
                 incomeText,
                 style: const TextStyle(
-                  fontSize: 20.0,
+                  fontSize: fontSize,
                   fontWeight: FontWeight.w500,
                 ),
               ),
@@ -309,7 +312,7 @@ List<Expanded> separateRow(int calendarIncome, int calendarExpense, int dayIncom
               child: Text(
                 expenseText,
                 style: const TextStyle(
-                  fontSize: 20.0,
+                  fontSize: fontSize,
                   fontWeight: FontWeight.w500,
                 ),
               ),
@@ -334,7 +337,7 @@ List<Expanded> separateRow(int calendarIncome, int calendarExpense, int dayIncom
               child: const Text(
                 '日收入',
                 style: TextStyle(
-                  fontSize: 20.0,
+                  fontSize: fontSize,
                   fontWeight: FontWeight.w500,
                 ),
               ),
@@ -359,7 +362,7 @@ List<Expanded> separateRow(int calendarIncome, int calendarExpense, int dayIncom
               child: const Text(
                 '日支出',
                 style: TextStyle(
-                  fontSize: 20.0,
+                  fontSize: fontSize,
                   fontWeight: FontWeight.w500,
                 ),
               ),
@@ -376,6 +379,7 @@ List<Expanded> separateRow(int calendarIncome, int calendarExpense, int dayIncom
 }
 
 List<Expanded> totalRow(int calendarBalance, int dayBalance, String balanceText) {
+  const fontSize = 11.0;
   return [
     Expanded(
       child: Container(
@@ -389,7 +393,7 @@ List<Expanded> totalRow(int calendarBalance, int dayBalance, String balanceText)
               child: Text(
                 balanceText,
                 style: const TextStyle(
-                  fontSize: 20.0,
+                  fontSize: fontSize,
                   fontWeight: FontWeight.w500,
                 ),
               ),
@@ -412,9 +416,9 @@ List<Expanded> totalRow(int calendarBalance, int dayBalance, String balanceText)
             Container(
               alignment: Alignment.center,
               child: const Text(
-                '日平衡',
+                '日收支',
                 style: TextStyle(
-                  fontSize: 20.0,
+                  fontSize: fontSize,
                   fontWeight: FontWeight.w500,
                 ),
               ),
@@ -431,8 +435,8 @@ List<Expanded> totalRow(int calendarBalance, int dayBalance, String balanceText)
 }
 
 Widget moneyFormatText(int money) {
-  const moneySize = 25.0;
-  const size = 15.0;
+  const moneySize = 22.0;
+  const size = 10.0;
   if (money > 9999999999) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
@@ -485,8 +489,8 @@ Widget moneyFormatText(int money) {
   return Row(
     mainAxisAlignment: MainAxisAlignment.center,
     children: [
-      moneyText(money.toStringAsFixed(0), 25.0),
-      moneyText(' 元', 15.0),
+      moneyText(money.toStringAsFixed(0), moneySize),
+      moneyText(' 元', size),
     ],
   );
 }
