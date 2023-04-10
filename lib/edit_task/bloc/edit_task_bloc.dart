@@ -288,7 +288,6 @@ class EditTaskBloc extends Bloc<EditTaskEvent, EditTaskState> {
     if (duration.inMinutes >= 60 && duration.inMinutes % 60 == 0) {
       return [(duration.inHours).toString(), '小時前'];
     }
-
     return [duration.inMinutes.toString(), '分前'];
   }
 }

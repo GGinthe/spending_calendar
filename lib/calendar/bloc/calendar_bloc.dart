@@ -2,10 +2,12 @@ import 'dart:async';
 
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:intl/intl.dart';
 import 'package:spending_calendar/calendar/calendar.dart';
 import 'package:spending_repository/spending_repository.dart';
 import 'package:tasks_repository/tasks_repository.dart';
 import 'package:table_calendar/table_calendar.dart';
+import 'package:spending_calendar/notification/notification.dart';
 
 part 'calendar_event.dart';
 
@@ -75,7 +77,18 @@ class CalendarBloc extends Bloc<CalendarEvent, CalendarState> {
     Emitter<CalendarState> emit,
   ) async {
     emit(state.copyWith(lastDeletedTask: () => event.task));
+
+    for (var notificationId in event.task.notificationsId) {
+      notification.cancelNotification(notificationId);
+    }
+
     await _tasksRepository.deleteTask(event.task.id);
+  }
+
+  String _dateFormat(DateTime? startDate, DateTime? endDate) {
+    final startText = startDate != null ? DateFormat('MM/dd – kk:mm').format(startDate) : '';
+    final endText = endDate != null ? DateFormat('MM/dd – kk:mm').format(endDate) : '';
+    return '$startText ~ $endText';
   }
 
   Future<void> _onUndoDeletionRequested(
@@ -89,6 +102,17 @@ class CalendarBloc extends Bloc<CalendarEvent, CalendarState> {
 
     final task = state.lastDeletedTask!;
     emit(state.copyWith(lastDeletedTask: () => null));
+
+    for (var i = 0; i < task.notificationsDuration.length; i++) {
+      final date = task.startDate!.subtract(task.notificationsDuration[i]);
+      // add notification if earlier than now
+      if (date.isAfter(DateTime.now())) {
+        notification.scheduleNotification(
+            task.notificationsId[i], task.title, _dateFormat(task.startDate, task.endDate), date,
+            payload: task.id);
+      }
+    }
+
     await _tasksRepository.saveTask(task);
   }
 
