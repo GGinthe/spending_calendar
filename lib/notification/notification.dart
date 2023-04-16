@@ -28,22 +28,6 @@ void notificationTapBackground(NotificationResponse notificationResponse) {
       ' payload: ${notificationResponse.payload}, '
       'input: ${notificationResponse.input}, '
       'notificationResponseType: ${notificationResponse.notificationResponseType}');
-  /*await Navigator.push(
-    context,
-    MaterialPageRoute<void>(builder: (context) => SecondScreen(payload)),
-  );*/
-  /*TasksRepository tasksRepository = context.read<TasksRepository>();
-  final task = tasksRepository.getTaskFromID(notificationResponse.payload);
-
-    Navigator.of(navigatorKey.currentContext!).push(
-        MaterialPageRoute(
-            builder: (context) =>
-                HomePage()));
-
-
-  Navigator.of(context).push(
-    EditTaskPage.route(initialTask: task),
-  );*/
 }
 
 class Notification {

@@ -109,12 +109,12 @@ class MoneyStatsRow extends StatelessWidget {
   }
 }
 
-List<Expanded> incomeRow(int monthIncome, int weekIncome, int dayIncome) {
+List<Widget> incomeRow(int monthIncome, int weekIncome, int dayIncome) {
   const fontSize = 11.0;
   return [
     Expanded(
       child: Container(
-        color: const Color(0x652DFF50),
+        color: const Color(0xC52DFF50),
         alignment: Alignment.center,
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -137,9 +137,15 @@ List<Expanded> incomeRow(int monthIncome, int weekIncome, int dayIncome) {
         ),
       ),
     ),
+    const VerticalDivider(
+      width: 1,
+      thickness: 1,
+      indent: 20,
+      endIndent: 0,
+    ),
     Expanded(
       child: Container(
-        color: const Color(0x652DFF50),
+        color: const Color(0xC52DFF50),
         alignment: Alignment.center,
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -162,9 +168,15 @@ List<Expanded> incomeRow(int monthIncome, int weekIncome, int dayIncome) {
         ),
       ),
     ),
+    const VerticalDivider(
+      width: 1,
+      thickness: 1,
+      indent: 20,
+      endIndent: 0,
+    ),
     Expanded(
       child: Container(
-        color: const Color(0x652DFF50),
+        color: const Color(0xC52DFF50),
         alignment: Alignment.center,
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -190,12 +202,12 @@ List<Expanded> incomeRow(int monthIncome, int weekIncome, int dayIncome) {
   ];
 }
 
-List<Expanded> expanseRow(int monthExpense, int weekExpense, int dayExpense) {
+List<Widget> expanseRow(int monthExpense, int weekExpense, int dayExpense) {
   const fontSize = 11.0;
   return [
     Expanded(
       child: Container(
-        color: const Color(0x80FF2D2D),
+        color: const Color(0xC2FF2D2D),
         alignment: Alignment.center,
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -218,9 +230,15 @@ List<Expanded> expanseRow(int monthExpense, int weekExpense, int dayExpense) {
         ),
       ),
     ),
+    const VerticalDivider(
+      width: 1,
+      thickness: 1,
+      indent: 20,
+      endIndent: 0,
+    ),
     Expanded(
       child: Container(
-        color: const Color(0x80FF2D2D),
+        color: const Color(0xC2FF2D2D),
         alignment: Alignment.center,
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -243,9 +261,15 @@ List<Expanded> expanseRow(int monthExpense, int weekExpense, int dayExpense) {
         ),
       ),
     ),
+    const VerticalDivider(
+      width: 1,
+      thickness: 1,
+      indent: 20,
+      endIndent: 0,
+    ),
     Expanded(
       child: Container(
-        color: const Color(0x80FF2D2D),
+        color: const Color(0xC2FF2D2D),
         alignment: Alignment.center,
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -271,13 +295,13 @@ List<Expanded> expanseRow(int monthExpense, int weekExpense, int dayExpense) {
   ];
 }
 
-List<Expanded> separateRow(int calendarIncome, int calendarExpense, int dayIncome, int dayExpense,
+List<Widget> separateRow(int calendarIncome, int calendarExpense, int dayIncome, int dayExpense,
     String incomeText, String expenseText) {
   const fontSize = 11.0;
   return [
     Expanded(
       child: Container(
-        color: const Color(0x652DFF50),
+        color: const Color(0xC52DFF50),
         alignment: Alignment.center,
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -300,9 +324,15 @@ List<Expanded> separateRow(int calendarIncome, int calendarExpense, int dayIncom
         ),
       ),
     ),
+    const VerticalDivider(
+      width: 1,
+      thickness: 1,
+      indent: 20,
+      endIndent: 0,
+    ),
     Expanded(
       child: Container(
-        color: const Color(0x80FF2D2D),
+        color: const Color(0xC2FF2D2D),
         alignment: Alignment.center,
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -325,9 +355,15 @@ List<Expanded> separateRow(int calendarIncome, int calendarExpense, int dayIncom
         ),
       ),
     ),
+    const VerticalDivider(
+      width: 1,
+      thickness: 1,
+      indent: 20,
+      endIndent: 0,
+    ),
     Expanded(
       child: Container(
-        color: const Color(0x652DFF50),
+        color: const Color(0xC52DFF50),
         alignment: Alignment.center,
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -350,9 +386,15 @@ List<Expanded> separateRow(int calendarIncome, int calendarExpense, int dayIncom
         ),
       ),
     ),
+    const VerticalDivider(
+      width: 1,
+      thickness: 1,
+      indent: 20,
+      endIndent: 0,
+    ),
     Expanded(
       child: Container(
-        color: const Color(0x80FF2D2D),
+        color: const Color(0xC2FF2D2D),
         alignment: Alignment.center,
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -378,12 +420,12 @@ List<Expanded> separateRow(int calendarIncome, int calendarExpense, int dayIncom
   ];
 }
 
-List<Expanded> totalRow(int calendarBalance, int dayBalance, String balanceText) {
+List<Widget> totalRow(int calendarBalance, int dayBalance, String balanceText) {
   const fontSize = 11.0;
   return [
     Expanded(
       child: Container(
-        color: const Color(0x652DFF50),
+        color: const Color(0xC52DFF50),
         alignment: Alignment.center,
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -406,9 +448,15 @@ List<Expanded> totalRow(int calendarBalance, int dayBalance, String balanceText)
         ),
       ),
     ),
+    const VerticalDivider(
+      width: 1,
+      thickness: 1,
+      indent: 20,
+      endIndent: 0,
+    ),
     Expanded(
       child: Container(
-        color: const Color(0x80FF2D2D),
+        color: const Color(0xC2FF2D2D),
         alignment: Alignment.center,
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
