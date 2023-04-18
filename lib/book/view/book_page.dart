@@ -28,7 +28,7 @@ class BookViews extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('行事曆'),
+        title: const Text('帳本'),
         /*actions: const [
          BookSpendingsFilterButton(),
          BookSpendingsOptionsButton(),
